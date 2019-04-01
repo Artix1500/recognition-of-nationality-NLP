@@ -1,5 +1,17 @@
 import glob
 import PyPDF2
+import numpy as np
+
+
+def processText(text):
+    dictionary = {}
+    for word in text.split():
+        if word not in dictionary:
+            dictionary[word] = 1
+        else:
+            dictionary[word] += 1
+    return dictionary
+
 
 def load_pdfs():
     root_dir = 'data'
@@ -24,7 +36,8 @@ def load_pdfs():
             count += 1
             text += pageObj.extractText()
 
-        print(text)
+        dict = processText(text)
+        print(dict)
 
 
 if __name__ == "__main__":
