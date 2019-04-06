@@ -1,10 +1,13 @@
 import glob
+import sys
 import string
 
 import PyPDF2
 import os
 import numpy as np
-from functools import reduce
+import codecs
+
+np.set_printoptions(threshold=sys.maxsize)
 
 
 def processText(text):
@@ -21,19 +24,19 @@ def processText(text):
 def splitData(csvContent):
     filenamesInFile = []
     quantitiesList = []
-    fileLines = []
 
     # assuming there is at least one line ended in \n
-    existingWords = csvContent[:csvContent.index("\n")].split(',')[1:]
 
+    index = csvContent.index("\n") if "\n" in csvContent else -1
+    existingWords = [] if index == -1 else csvContent[:index].split(',')[1:]
+    # print('ex:' + str(len(existingWords)))
     for line in csvContent.split('\n')[1:]:
         row = line.strip().split(',')
-        fileLines.append(row)
         filenamesInFile.append(row[0])
-        quantitiesList.append(np.array(row[1:]))
+        quantitiesList.append(np.array(row[1:], dtype='int32'))
     wordQuantitiesMatrix = np.array(quantitiesList)
 
-    return existingWords, filenamesInFile, fileLines, wordQuantitiesMatrix
+    return existingWords, filenamesInFile, wordQuantitiesMatrix
 
 
 def getIndexesOfRowsToBeDeleted(filenamesInFile, rowsToBeDeleted):
@@ -44,11 +47,11 @@ def getIndexesOfRowsToBeDeleted(filenamesInFile, rowsToBeDeleted):
     return indexes
 
 
-def deleteRows(indexesOfRowsToBeDeleted, fileLines, wordQuantitiesMatrix):
+# probably unnecessary to delete fileLines
+def deleteRows(indexesOfRowsToBeDeleted, wordQuantitiesMatrix):
     for index in indexesOfRowsToBeDeleted[::-1]:
-        del fileLines[index]
         wordQuantitiesMatrix = np.delete(wordQuantitiesMatrix, index, axis=0)
-    return fileLines
+    return wordQuantitiesMatrix
 
 
 def readPDFsFromNewFiles(rowsToBeAdded):
@@ -76,73 +79,88 @@ def readPDFsFromNewFiles(rowsToBeAdded):
     return newFilesDicts
 
 
-def addNewRows(fileLines, newFilesDicts, existingWords, wordQuantitiesMatrix):
+def addNewRows(newFilesDicts, existingWords, wordQuantitiesMatrix):
     for filename, allwords in newFilesDicts.items():
         # concatenation of strings in python makes new object, thus we have array for now
         newWords = []
         newRowQuantities = []
+        existingWordsQuantities = {}
+        oldWordsLength = len(existingWords)
         for word, quantity in allwords.items():
             if word not in existingWords:
                 newWords.append(word)
-                newRowQuantities.append(str(quantity))
+                newRowQuantities.append(quantity)
+            else:
+                existingWordsQuantities[word] = quantity
+
         existingWords.extend(newWords)
 
-        # this is bad
-        rowOfQuantities = str(reduce(lambda x, y: x + "," + y, newRowQuantities))
-        fileLines.append(filename + ',' + rowOfQuantities)
-        # print("\n\n\n")
-        # print(existingWords)
+        newMatrix = np.zeros((wordQuantitiesMatrix.shape[0] + 1, len(existingWords)), dtype="int32")
+        newMatrix[:-1, :-len(newWords)] = wordQuantitiesMatrix
 
-        # add zeros to numpy array
+        for k, v in existingWordsQuantities.items():
+            newMatrix[-1, existingWords.index(k)] = v
 
-
-def removeZeroColumns():
-    pass
+        newMatrix[-1, oldWordsLength:] = newRowQuantities
+        wordQuantitiesMatrix = newMatrix
+    return existingWords, wordQuantitiesMatrix
 
 
-def updateCSV():
-    pass
+def removeZeroColumns(existingWords, wordQuantitiesMatrix):
+    indexesToDelete = list(np.argwhere(np.all(wordQuantitiesMatrix[..., :] == 0, axis=0)).flat)
+    indexesToDelete.sort()
+    wordQuantitiesMatrix = np.delete(wordQuantitiesMatrix, indexesToDelete, 1)
+
+    for index in indexesToDelete[::-1]:
+        del existingWords[index]
+
+    return existingWords, wordQuantitiesMatrix
+
+
+def updateCSV(existingWords, rowsToBeAdded, wordQuantitiesMatrix, pathToCsv):
+    rows = []
+    firstRow = ',' + ','.join(existingWords)
+    rows.append(firstRow)
+    for i in range(len(rowsToBeAdded)):
+        quantities = ','.join(map(str, wordQuantitiesMatrix.astype(int)[i, :].tolist()))
+        rows.append(rowsToBeAdded[i] + ',' + quantities)
+    finalCSVContent = '\n'.join(rows)
+
+    with codecs.open(pathToCsv, 'w', 'utf-8') as csvFile:
+        csvFile.write(finalCSVContent)
 
 
 def updateData():
     root_dir = 'data'
     pathToCsv = os.path.join(root_dir, 'data.csv')
-    csvFile = open(pathToCsv, 'r+')
-    csvContent = csvFile.read().strip()
-    csvFile.close()
+    with codecs.open(pathToCsv, 'r+', 'utf-8') as csvFile:
+        csvContent = csvFile.read().strip()
 
-    existingWords, filenamesInFile, fileLines, wordQuantitiesMatrix = splitData(csvContent)
+    existingWords, filenamesInFile, wordQuantitiesMatrix = splitData(csvContent)
+    # tymczasowe sprawdzenie poprawnosci rozmiarow - tu jest bug (gdy slowa z przecinkami)
+    print(len(existingWords), wordQuantitiesMatrix.shape)
     filenamesSearched = list(glob.iglob(root_dir + '**/**/*.pdf', recursive=True))
     rowsToBeDeleted = list(set(filenamesInFile) - set(filenamesSearched))
     rowsToBeAdded = list(set(filenamesSearched) - set(filenamesInFile))
+
+    if not rowsToBeAdded and not rowsToBeDeleted:
+        return
+
     indexesOfRowsToBeDeleted = getIndexesOfRowsToBeDeleted(filenamesInFile, rowsToBeDeleted)
 
-    print(existingWords, filenamesInFile, fileLines, wordQuantitiesMatrix)
-    deleteRows(indexesOfRowsToBeDeleted, fileLines, wordQuantitiesMatrix)
+    wordQuantitiesMatrix = deleteRows(indexesOfRowsToBeDeleted, wordQuantitiesMatrix)
 
     # for only new files:
-    newFilesDicts = readPDFsFromNewFiles(rowsToBeAdded)
+    if rowsToBeAdded:
+        print("Reading PDFs")
+        newFilesDicts = readPDFsFromNewFiles(rowsToBeAdded)
+        existingWords, wordQuantitiesMatrix = addNewRows(newFilesDicts, existingWords, wordQuantitiesMatrix)
 
-    addNewRows(fileLines, newFilesDicts, existingWords, wordQuantitiesMatrix)
-    removeZeroColumns()
-    updateCSV()
+    existingWords, wordQuantitiesMatrix = removeZeroColumns(existingWords, wordQuantitiesMatrix)
 
-    # print(dict)
+    updateCSV(existingWords, rowsToBeAdded, wordQuantitiesMatrix, pathToCsv)
 
-    # new string (line for data.csv)
-    # read lines from dictionary.txt
-    # for each word
-    #   append to string number and comma
-    #   remove this key from dict
-    # if dict is not empty after removing known words start updating CSV file
-    # For each key in dict
-    #   add column to CSV file and put 0 in each line
-    #   append number to string and comma
-    # after updating CSV append our string to the end of data.CSV
-    # print(dict)
-
-
-#
 
 if __name__ == "__main__":
     updateData()
+    print('The end.')
