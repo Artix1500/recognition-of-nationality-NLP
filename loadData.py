@@ -13,7 +13,11 @@ np.set_printoptions(threshold=sys.maxsize)
 def processText(text):
     dictionary = {}
     for word in text.split():
+        if not word:
+            continue
         if word not in dictionary:
+            if ',' in word:
+                word = word.replace(',', '')
             dictionary[word] = 1
         else:
             dictionary[word] += 1
@@ -107,27 +111,37 @@ def addNewRows(newFilesDicts, existingWords, wordQuantitiesMatrix):
 
 
 def removeZeroColumns(existingWords, wordQuantitiesMatrix):
+    print("Removing columns...")
     indexesToDelete = list(np.argwhere(np.all(wordQuantitiesMatrix[..., :] == 0, axis=0)).flat)
     indexesToDelete.sort()
-    wordQuantitiesMatrix = np.delete(wordQuantitiesMatrix, indexesToDelete, 1)
+    indexesToDelete.reverse()
 
-    for index in indexesToDelete[::-1]:
+    oldCount = wordQuantitiesMatrix.shape[1]
+    wordQuantitiesMatrix = np.delete(wordQuantitiesMatrix, indexesToDelete, 1)
+    newCount = wordQuantitiesMatrix.shape[1]
+
+    if oldCount != newCount:
+        print("Dictionary shortened from " + str(oldCount) + " to " + str(newCount))
+
+    for index in indexesToDelete:
         del existingWords[index]
 
     return existingWords, wordQuantitiesMatrix
 
 
-def updateCSV(existingWords, rowsToBeAdded, wordQuantitiesMatrix, pathToCsv):
+def updateCSV(existingWords, filenamesSearched, wordQuantitiesMatrix, pathToCsv):
     rows = []
     firstRow = ',' + ','.join(existingWords)
     rows.append(firstRow)
-    for i in range(len(rowsToBeAdded)):
+    for i in range(wordQuantitiesMatrix.shape[0]):
         quantities = ','.join(map(str, wordQuantitiesMatrix.astype(int)[i, :].tolist()))
-        rows.append(rowsToBeAdded[i] + ',' + quantities)
+        rows.append(filenamesSearched[i] + ',' + quantities)
     finalCSVContent = '\n'.join(rows)
 
     with codecs.open(pathToCsv, 'w', 'utf-8') as csvFile:
         csvFile.write(finalCSVContent)
+    print("\nCSV updated. Now containing " + str(len(existingWords)) + " words and " + str(
+        wordQuantitiesMatrix.shape[0]) + " files")
 
 
 def updateData():
@@ -137,30 +151,36 @@ def updateData():
         csvContent = csvFile.read().strip()
 
     existingWords, filenamesInFile, wordQuantitiesMatrix = splitData(csvContent)
-    # tymczasowe sprawdzenie poprawnosci rozmiarow - tu jest bug (gdy slowa z przecinkami)
-    print(len(existingWords), wordQuantitiesMatrix.shape)
     filenamesSearched = list(glob.iglob(root_dir + '**/**/*.pdf', recursive=True))
+    filenamesSearched.sort()
     rowsToBeDeleted = list(set(filenamesInFile) - set(filenamesSearched))
+    rowsToBeDeleted.sort()
     rowsToBeAdded = list(set(filenamesSearched) - set(filenamesInFile))
+    rowsToBeAdded.sort()
+
+    print("\nFiles found in filesystem: " + str(filenamesSearched))
+    print("Files to be added to CSV: " + str(rowsToBeAdded))
+    print("Files to be deleted from CSV: " + str(rowsToBeDeleted))
 
     if not rowsToBeAdded and not rowsToBeDeleted:
+        print("\nNothing to be changed")
+        print(
+            "Now CSV contains " + str(len(existingWords)) + " words and " + str(wordQuantitiesMatrix.shape[0]) + " files")
         return
 
     indexesOfRowsToBeDeleted = getIndexesOfRowsToBeDeleted(filenamesInFile, rowsToBeDeleted)
-
     wordQuantitiesMatrix = deleteRows(indexesOfRowsToBeDeleted, wordQuantitiesMatrix)
 
     # for only new files:
     if rowsToBeAdded:
-        print("Reading PDFs")
+        print("Reading PDFs...")
         newFilesDicts = readPDFsFromNewFiles(rowsToBeAdded)
         existingWords, wordQuantitiesMatrix = addNewRows(newFilesDicts, existingWords, wordQuantitiesMatrix)
 
     existingWords, wordQuantitiesMatrix = removeZeroColumns(existingWords, wordQuantitiesMatrix)
-
-    updateCSV(existingWords, rowsToBeAdded, wordQuantitiesMatrix, pathToCsv)
+    updateCSV(existingWords, filenamesSearched, wordQuantitiesMatrix, pathToCsv)
 
 
 if __name__ == "__main__":
     updateData()
-    print('The end.')
+    print('The end')
