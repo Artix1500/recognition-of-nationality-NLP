@@ -165,7 +165,8 @@ def updateData():
     if not rowsToBeAdded and not rowsToBeDeleted:
         print("\nNothing to be changed")
         print(
-            "Now CSV contains " + str(len(existingWords)) + " words and " + str(wordQuantitiesMatrix.shape[0]) + " files")
+            "Now CSV contains " + str(len(existingWords)) + " words and " + str(
+                wordQuantitiesMatrix.shape[0]) + " files")
         return
 
     indexesOfRowsToBeDeleted = getIndexesOfRowsToBeDeleted(filenamesInFile, rowsToBeDeleted)
@@ -178,7 +179,12 @@ def updateData():
         existingWords, wordQuantitiesMatrix = addNewRows(newFilesDicts, existingWords, wordQuantitiesMatrix)
 
     existingWords, wordQuantitiesMatrix = removeZeroColumns(existingWords, wordQuantitiesMatrix)
-    updateCSV(existingWords, filenamesSearched, wordQuantitiesMatrix, pathToCsv)
+
+    # to get the proper order of rows in CSV
+    filenames = [x for x in filenamesInFile if x not in rowsToBeDeleted]
+    filenames.extend(rowsToBeAdded)
+
+    updateCSV(existingWords, filenames, wordQuantitiesMatrix, pathToCsv)
 
 
 if __name__ == "__main__":
