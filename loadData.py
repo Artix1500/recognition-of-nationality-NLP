@@ -6,6 +6,8 @@ import PyPDF2
 import os
 import numpy as np
 import codecs
+from tika import parser
+
 
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -64,22 +66,26 @@ def readPDFsFromNewFiles(rowsToBeAdded):
     for newFile in rowsToBeAdded:
 
         # creating an object
-        file = open(newFile, 'rb')
+        # file = open(newFile, 'rb')
+        #
+        # # creating a pdf reader object
+        # fileReader = PyPDF2.PdfFileReader(file)
+        #
+        # # get number of pages
+        # num_pages = fileReader.numPages
+        # count = 0
+        # text = ""
+        # # The while loop will read each page
+        # while count < num_pages:
+        #     pageObj = fileReader.getPage(count)
+        #     count += 1
+        #     text += pageObj.extractText()
+        #
+        # newFilesDicts[newFile] = processText(text)
 
-        # creating a pdf reader object
-        fileReader = PyPDF2.PdfFileReader(file)
+        text = parser.from_file(newFile)
+        newFilesDicts[newFile] = processText(text['content'])
 
-        # get number of pages
-        num_pages = fileReader.numPages
-        count = 0
-        text = ""
-        # The while loop will read each page
-        while count < num_pages:
-            pageObj = fileReader.getPage(count)
-            count += 1
-            text += pageObj.extractText()
-
-        newFilesDicts[newFile] = processText(text)
     return newFilesDicts
 
 
@@ -178,7 +184,8 @@ def updateData():
         newFilesDicts = readPDFsFromNewFiles(rowsToBeAdded)
         existingWords, wordQuantitiesMatrix = addNewRows(newFilesDicts, existingWords, wordQuantitiesMatrix)
 
-    existingWords, wordQuantitiesMatrix = removeZeroColumns(existingWords, wordQuantitiesMatrix)
+    if wordQuantitiesMatrix.size != 0:
+        existingWords, wordQuantitiesMatrix = removeZeroColumns(existingWords, wordQuantitiesMatrix)
 
     # to get the proper order of rows in CSV
     filenames = [x for x in filenamesInFile if x not in rowsToBeDeleted]
