@@ -2,10 +2,10 @@ import glob
 import sys
 import string
 
-import PyPDF2
 import os
 import numpy as np
 import codecs
+import textprocessing as tp
 from tika import parser
 
 
@@ -13,18 +13,7 @@ np.set_printoptions(threshold=sys.maxsize)
 
 
 def processText(text):
-    dictionary = {}
-    for word in text.split():
-        if not word:
-            continue
-        if word not in dictionary:
-            if ',' in word:
-                word = word.replace(',', '')
-            dictionary[word] = 1
-        else:
-            dictionary[word] += 1
-
-    return dictionary
+    return tp.create_dictionary(tp.split_to_words(text))
 
 
 def splitData(csvContent):
