@@ -18,7 +18,7 @@ class Classifier:
 
     # changes the vector to the need of network
     def processVector(self, vector):
-        return np.ones(shape=self.inputSize)
+        return vector
 
     # builds a model, the hidden layers' size can be customized
     def buildModel(self, layer1Size=10, layer2Size=10):
