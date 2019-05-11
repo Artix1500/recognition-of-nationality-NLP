@@ -8,7 +8,6 @@ import codecs
 import textprocessing as tp
 from tika import parser
 
-
 np.set_printoptions(threshold=sys.maxsize)
 
 
@@ -28,7 +27,7 @@ def splitData(csvContent):
     for line in csvContent.split('\n')[1:]:
         row = line.strip().split(',')
         filenamesInFile.append(row[0])
-        quantitiesList.append(np.array(row[1:], dtype='int32'))
+        quantitiesList.append(np.array(row[1:], dtype='uint16'))
     wordQuantitiesMatrix = np.array(quantitiesList)
 
     return existingWords, filenamesInFile, wordQuantitiesMatrix
@@ -53,7 +52,6 @@ def readPDFsFromNewFiles(rowsToBeAdded):
     # fileName: its content
     newFilesDicts = {}
     for newFile in rowsToBeAdded:
-
         # creating an object
         # file = open(newFile, 'rb')
         #
@@ -94,8 +92,13 @@ def addNewRows(newFilesDicts, existingWords, wordQuantitiesMatrix):
 
         existingWords.extend(newWords)
 
-        newMatrix = np.zeros((wordQuantitiesMatrix.shape[0] + 1, len(existingWords)), dtype="int32")
-        newMatrix[:-1, :-len(newWords)] = wordQuantitiesMatrix
+        newMatrix = np.zeros((wordQuantitiesMatrix.shape[0] + 1, len(existingWords)), dtype="uint16")
+        if newWords:
+            print(filename + " is being processed")
+            newMatrix[:-1, :-len(newWords)] = wordQuantitiesMatrix
+        else:
+            print("! " + filename + " DID NOT add any new words")
+            newMatrix[:-1, :] = wordQuantitiesMatrix
 
         for k, v in existingWordsQuantities.items():
             newMatrix[-1, existingWords.index(k)] = v
@@ -179,6 +182,9 @@ def updateData():
     # to get the proper order of rows in CSV
     filenames = [x for x in filenamesInFile if x not in rowsToBeDeleted]
     filenames.extend(rowsToBeAdded)
+
+    if wordQuantitiesMatrix.size == 0:
+        existingWords.clear()
 
     updateCSV(existingWords, filenames, wordQuantitiesMatrix, pathToCsv)
 

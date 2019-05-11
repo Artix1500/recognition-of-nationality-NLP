@@ -3,8 +3,16 @@
   <component name="ChangeListManager">
     <list default="true" id="17e5547f-7a4b-4a44-9973-b1cac8e7ed15" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/English/HalesSmith.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Polish/Schuld.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/Polish/AndrzejewskaStolinska.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/Polish/Badowski.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/Polish/BartczakZapalowski.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/Polish/BarwiczMorawskiWisniewski.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/Polish/BerezinskiJasiulSzpyrka.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/Polish/BieleckiKaminska.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/Polish/BlasiakKrasinskiPoplawskiSakowskiSarnik.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/Polish/BlochoNalepa.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/Polish/Bojanczyk.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/dictionary.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/loadData.py" beforeDir="false" afterPath="$PROJECT_DIR$/loadData.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -18,11 +26,20 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/loadData.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-340">
-              <caret line="76" column="19" lean-forward="true" selection-start-line="76" selection-start-column="19" selection-end-line="76" selection-end-column="19" />
+            <state relative-caret-position="1520">
+              <caret line="161" lean-forward="true" selection-start-line="161" selection-end-line="161" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/textprocessing.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="748">
+              <caret line="44" column="1" selection-start-line="44" selection-start-column="1" selection-end-line="44" selection-end-column="1" />
             </state>
           </provider>
         </entry>
@@ -32,6 +49,12 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>nd</find>
+      <find>txt</find>
+      <find>dtyp</find>
+      <find>int32</find>
+      <find>addnewRows</find>
+      <find>shape]</find>
+      <find>shorte</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -40,6 +63,7 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
+        <option value="$PROJECT_DIR$/textprocessing.py" />
         <option value="$PROJECT_DIR$/loadData.py" />
       </list>
     </option>
@@ -152,11 +176,18 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/loadData.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-340">
-          <caret line="76" column="19" lean-forward="true" selection-start-line="76" selection-start-column="19" selection-end-line="76" selection-end-column="19" />
+        <state relative-caret-position="1520">
+          <caret line="161" lean-forward="true" selection-start-line="161" selection-end-line="161" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/textprocessing.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="748">
+          <caret line="44" column="1" selection-start-line="44" selection-start-column="1" selection-end-line="44" selection-end-column="1" />
         </state>
       </provider>
     </entry>
