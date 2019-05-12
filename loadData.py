@@ -168,14 +168,12 @@ def updateData():
 
     indexesOfRowsToBeDeleted = getIndexesOfRowsToBeDeleted(filenamesInFile, rowsToBeDeleted)
     wordQuantitiesMatrix = deleteRows(indexesOfRowsToBeDeleted, wordQuantitiesMatrix)
-
-    # for only new files:
     if rowsToBeAdded:
         print("Reading PDFs...")
         newFilesDicts = readPDFsFromNewFiles(rowsToBeAdded)
         existingWords, wordQuantitiesMatrix = addNewRows(newFilesDicts, existingWords, wordQuantitiesMatrix)
 
-    if wordQuantitiesMatrix.size != 0:
+    if wordQuantitiesMatrix.size != 0 and rowsToBeDeleted.__len__() > 0:
         existingWords, wordQuantitiesMatrix = removeZeroColumns(existingWords, wordQuantitiesMatrix)
 
     # to get the proper order of rows in CSV
