@@ -10,6 +10,8 @@ from tika import parser
 
 np.set_printoptions(threshold=sys.maxsize)
 
+FileCount = 0
+LineCount = 0
 
 def processText(text):
     return tp.create_dictionary(tp.split_to_words(text))
@@ -48,30 +50,23 @@ def deleteRows(indexesOfRowsToBeDeleted, wordQuantitiesMatrix):
     return wordQuantitiesMatrix
 
 
+
 def readPDFsFromNewFiles(rowsToBeAdded):
     # fileName: its content
     newFilesDicts = {}
     for newFile in rowsToBeAdded:
-        # creating an object
-        # file = open(newFile, 'rb')
-        #
-        # # creating a pdf reader object
-        # fileReader = PyPDF2.PdfFileReader(file)
-        #
-        # # get number of pages
-        # num_pages = fileReader.numPages
-        # count = 0
-        # text = ""
-        # # The while loop will read each page
-        # while count < num_pages:
-        #     pageObj = fileReader.getPage(count)
-        #     count += 1
-        #     text += pageObj.extractText()
-        #
-        # newFilesDicts[newFile] = processText(text)
-
-        text = parser.from_file(newFile)
-        newFilesDicts[newFile] = processText(text['content'])
+        global FileCount
+        try:
+            FileCount = FileCount + 1
+            text = parser.from_file(newFile)
+            newFilesDicts[newFile] = processText(text['content'])
+            print(str(FileCount) + '\t')
+        except KeyError:
+            print("KEYERROR in " + newFile)
+        except UnicodeEncodeError:
+            print("UnicodeEncodeError in " + newFile)
+        except:
+            print("STH ELSE WENT WRONG!")
 
     return newFilesDicts
 
@@ -131,11 +126,15 @@ def updateCSV(existingWords, filenamesSearched, wordQuantitiesMatrix, pathToCsv)
     rows = []
     firstRow = ',' + ','.join(existingWords)
     rows.append(firstRow)
+    global LineCount
     for i in range(wordQuantitiesMatrix.shape[0]):
+        print("SAVE the: " + str(LineCount) + " line to rows var")
+        LineCount = LineCount + 1
         quantities = ','.join(map(str, wordQuantitiesMatrix.astype(int)[i, :].tolist()))
         rows.append(filenamesSearched[i] + ',' + quantities)
     finalCSVContent = '\n'.join(rows)
 
+    print("SAVE the rows to file")
     with codecs.open(pathToCsv, 'w', 'utf-8') as csvFile:
         csvFile.write(finalCSVContent)
     print("\nCSV updated. Now containing " + str(len(existingWords)) + " words and " + str(
