@@ -1,7 +1,12 @@
 import pandas as pd
+df = pd.DataFrame()
 
 print("Reading data")
-data = pd.read_csv("data.csv")
+data = df
+for chunk in pd.read_csv('data.csv',  chunksize=100):
+    data = pd.concat([data, chunk])
+    print(data)
+
 print("dropping first column")
 data = data.drop("Unnamed: 0", axis=1)
 
