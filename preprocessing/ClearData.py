@@ -10,7 +10,7 @@ def ClearData(pathFrom="data.csv", pathTo="ProcessedData.csv", withLemmatization
         data = pd.concat([data, chunk])
     print(data)
 
-s
+
     if withLemmatization:
         print("Lemmatization")
         data = dataLemmatization(data)

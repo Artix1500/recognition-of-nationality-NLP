@@ -6,12 +6,14 @@ import os
 import numpy as np
 import codecs
 import textprocessing as tp
+import ner
 from tika import parser
 
 np.set_printoptions(threshold=sys.maxsize)
 
 FileCount = 0
 LineCount = 0
+
 
 def processText(text):
     return tp.create_dictionary(tp.split_to_words(text))
@@ -48,7 +50,6 @@ def deleteRows(indexesOfRowsToBeDeleted, wordQuantitiesMatrix):
     for index in indexesOfRowsToBeDeleted[::-1]:
         wordQuantitiesMatrix = np.delete(wordQuantitiesMatrix, index, axis=0)
     return wordQuantitiesMatrix
-
 
 
 def readPDFsFromNewFiles(rowsToBeAdded):

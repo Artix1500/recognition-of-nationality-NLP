@@ -108,3 +108,6 @@ venv.bak/
 *.csv
 /data/data.csv
 
+#stanford tagger
+/stanford
+/stanford/*

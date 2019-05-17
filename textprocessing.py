@@ -19,7 +19,7 @@ def split_to_words(rawtext):
         word = buffer + raw_word.lower()
         start_index, end_index = 0, len(word)
         buffer = ''
-        if word[end_index-1] in [',', '.', ':', ';', '?', '!']:
+        if word[end_index - 1] in [',', '.', ':', ';', '?', '!']:
             if end_index - start_index < 2:
                 continue
             end_index -= 1
@@ -27,18 +27,19 @@ def split_to_words(rawtext):
             if end_index - start_index < 2:
                 continue
             start_index += 1
-        if word[end_index-1] == ')':
+        if word[end_index - 1] == ')':
             if end_index - start_index < 2:
                 continue
             end_index -= 1
-        if word[end_index-1] == '-':
+        if word[end_index - 1] == '-':
             if end_index - start_index < 2:
                 continue
-            buffer = word[:end_index-1]
+            buffer = word[:end_index - 1]
             continue
         word = word[start_index:end_index]
         if re.match("^[{}]+-?[{}]*$".format(all_letters, all_letters), word):
-            text.append(word)
+            if len(word) > 1:
+                text.append(word)
     return text
 
 
@@ -51,6 +52,7 @@ def create_dictionary(words_list):
 
 if __name__ == '__main__':
     from tika import parser
+
     pdf_path = 'data/Polish/Bojanczyk.pdf'
     pdf_text = parser.from_file(pdf_path)
     words_list = split_to_words(pdf_text['content'])
@@ -58,4 +60,3 @@ if __name__ == '__main__':
     for word in sorted(words_dict, key=words_dict.get, reverse=False):
         print(words_dict[word], word)
     print("Total words count:", len(words_list))
-
