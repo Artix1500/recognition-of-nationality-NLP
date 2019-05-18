@@ -1,7 +1,7 @@
 from keras.models import Sequential
 from keras.layers import Dense
 import numpy as np
-
+from VectorProcessing import VectorProcessing as vp
 
 # from loadData import processText
 
@@ -17,8 +17,9 @@ class Classifier:
         self.model = self.buildModel()
 
     # changes the vector to the need of network
-    def processVector(self, vector):
-        return vector
+    def getData(self, path="SelectedData.csv"):
+        vectorProcesser= vp()
+        return vp.GetData(path)
 
     # builds a model, the hidden layers' size can be customized
     def buildModel(self, layer1Size=10, layer2Size=10):
@@ -37,7 +38,7 @@ class Classifier:
     # nepochs - how many iterations
     # nbatch - the number of instances that are evaluated before
     # a weight update in the network is performed
-    def train(self, x, y, nepochs=150, nbatch=self.batchSize):
+    def train(self, x, y, nepochs=150, nbatch=2):
         self.model.fit(x, y, epochs=nepochs, batch_size=nbatch)
 
     # evaluates the model, checks how well it predicts
@@ -49,3 +50,4 @@ class Classifier:
         predictions = self.model.predict(x)
         # round predictions
         rounded = [round(x[0]) for x in predictions]
+
