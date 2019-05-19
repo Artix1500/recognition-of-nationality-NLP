@@ -1,22 +1,30 @@
 from classifier import Classifier
 import numpy as np
+from VectorProcessing import VectorProcessing as vp
 
 
 def Run():
-    clf = Classifier()
+    clf = Classifier(2,999,5)
     clf.compileModel()
-    X, Y = CreateSomeData(xSize=10, howMany=5)
-    clf.train(X, Y)
-    clf.evaluate(X, Y)
+    trainData , testData = getData()
+
+    # print(len(trainData))
+    # print(trainData[55]['X'])
+    # print(len(testData))
+
+    # X, Y = CreateSomeData(xSize=10, howMany=5)
+
+    trainX = np.array(list(map(lambda x: x['X'][0], trainData)))
+    trainY = np.array(list(map(lambda x: x['Y'], trainData)))
+    testX = np.array(list(map(lambda x: x['X'][0], testData)))
+    testY = np.array(list(map(lambda x: x['Y'], testData)))
+
+    clf.train(trainX, trainY)
+    clf.evaluate(testX, testY)
 
 
-def CreateSomeData(xSize, howMany):
-    xList = []
-    yList = []
-    for i in range(howMany):
-        xList.append(np.ones(shape=xSize))
-        yList = np.array([1])
-    return list(xList, yList)
-
+def getData(path="SelectedData.csv"):
+    vectorProcesser= vp()
+    return vectorProcesser.GetData(path)
 
 Run()

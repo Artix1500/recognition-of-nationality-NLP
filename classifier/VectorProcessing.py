@@ -7,12 +7,10 @@ NATIONALITIES= {"British": 0, "Chinese": 1, "French": 2, "Polish": 3, "Russian":
 
 
 class VectorProcessing:
-
-
     def __init__(self):
         self.wordCountColumn = 1
         self.xStartColumn=3
-        self.xEndColumn = -2
+        self.xEndColumn = -1
         self.pathColumn = -1
 
     # returns dataset witch is list of dictionaries
@@ -23,6 +21,8 @@ class VectorProcessing:
         for index, row in data.iterrows():
             X=row[self.xStartColumn:self.xEndColumn]
             XTF=self.CreateTermFrequencyVector(X)
+            if XTF is None:
+                continue
             # not sure if Y shouldn't be reshaped as well
             dataset.append({"X": np.asarray(XTF).reshape(1, -1), "Y": self.ExtractLabel(row[self.pathColumn])})
         return dataset
@@ -38,8 +38,11 @@ class VectorProcessing:
 
 
     def CreateTermFrequencyVector(self, vector):
-        record = vector[self.xStartColumn:self.xEndColumn]
+        record = vector
         wordCount = vector[self.wordCountColumn]
+        if wordCount is 0:
+            print("Wordcount is 0")
+            return None
         if wordCount is None:
             print("WORDCOUNT IS NONE!!!")
             return None
@@ -53,6 +56,7 @@ class VectorProcessing:
 
     # returns splited dataset from path, trainSetRate=trainSetLength/dataSetSize
     def GetData(self, path = "SelectedData.csv", trainSetRate = 0.6):
+        # print(type(self))
         dataSet = self.CreateDataSet(path)
         self.ShuffleData(dataSet)
         middlePoint = (int)(len(dataSet)*trainSetRate)

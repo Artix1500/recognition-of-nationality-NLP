@@ -16,11 +16,6 @@ class Classifier:
         self.outputSize = outputSize
         self.model = self.buildModel()
 
-    # changes the vector to the need of network
-    def getData(self, path="SelectedData.csv"):
-        vectorProcesser= vp()
-        return vp.GetData(path)
-
     # builds a model, the hidden layers' size can be customized
     def buildModel(self, layer1Size=10, layer2Size=10):
         model = Sequential()
