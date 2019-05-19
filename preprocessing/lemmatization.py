@@ -10,7 +10,16 @@ def dataLemmatization(data):
     allWords = data.columns
     newQuantityDF = pd.DataFrame()
     lemmatizer = WordNetLemmatizer()
-    for word in allWords:
+    i = 0
+
+    if "Unnamed: 0" in allWords:
+        newQuantityDF["Unnamed: 0"] = data["Unnamed: 0"]
+        i += 1
+    if "Word_Count" in allWords:
+        newQuantityDF["Word_Count"] = data["Word_Count"]
+        i += 1
+
+    for word in allWords[i:]:
         print("New Word "+word)
         lemmatizedWord = lemmatizer.lemmatize(word)
         print("lemmatized word " + word)
@@ -20,6 +29,6 @@ def dataLemmatization(data):
         else:
             print("is not")
             newWords.append(lemmatizedWord)
-            newCol = data[word]
-            newQuantityDF = pd.concat([newQuantityDF, pd.DataFrame({lemmatizedWord:newCol})], axis=1)
+            newQuantityDF[lemmatizedWord] = data[word]
+
     return newQuantityDF
