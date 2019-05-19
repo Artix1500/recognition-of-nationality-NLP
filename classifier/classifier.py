@@ -33,7 +33,7 @@ class Classifier:
     # nepochs - how many iterations
     # nbatch - the number of instances that are evaluated before
     # a weight update in the network is performed
-    def train(self, x, y, nepochs=150, nbatch=2):
+    def train(self, x, y, nepochs=300, nbatch=2):
         self.model.fit(x, y, epochs=nepochs, batch_size=nbatch)
 
     # evaluates the model, checks how well it predicts
@@ -45,4 +45,5 @@ class Classifier:
         predictions = self.model.predict(x)
         # round predictions
         rounded = [round(x[0]) for x in predictions]
+        return predictions
 
