@@ -34,12 +34,31 @@ class Classifier:
     # nbatch - the number of instances that are evaluated before
     # a weight update in the network is performed
     def train(self, x, y, nepochs=300, nbatch=2):
-        self.model.fit(x, y, epochs=nepochs, batch_size=nbatch)
+        self.model.fit(x, y, epochs=nepochs, batch_size=nbatch, verbose=0)
 
     # evaluates the model, checks how well it predicts
     def evaluate(self, x, y):
         scores = self.model.evaluate(x, y)
         print("\n%s: %.2f%%" % ("text predicted:", scores[1] * 100))
+        
+    def testAccuracy(self, x, y):
+        predictions = []
+        good= 0
+        all_pieces= len(x)
+        
+        for one_x in x:
+            predictions.append(self.model.predict(np.asarray(one_x).reshape(1, -1)))
+        for i in range(all_pieces):
+           # print("label: ", y[i])
+           # print("predicted: ", predictions[i])
+            if np.argmax(predictions[i]) == np.argmax(y[i]):
+            #    print("goooood")
+                good+=1
+        acc = good/all_pieces
+        print("accuracy: ", acc)    
+        return acc
+        
+
 
     def predict(self, x):
         predictions = self.model.predict(x)
