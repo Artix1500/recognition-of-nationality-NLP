@@ -19,7 +19,7 @@ def split_to_words(raw_text):
         word = buffer + raw_word.lower()
         start_index, end_index = 0, len(word)
         buffer = ''
-        if word[end_index-1] in [',', '.', ':', ';', '?', '!']:
+        if word[end_index - 1] in [',', '.', ':', ';', '?', '!']:
             if end_index - start_index < 2:
                 continue
             end_index -= 1
@@ -27,14 +27,14 @@ def split_to_words(raw_text):
             if end_index - start_index < 2:
                 continue
             start_index += 1
-        if word[end_index-1] == ')':
+        if word[end_index - 1] == ')':
             if end_index - start_index < 2:
                 continue
             end_index -= 1
-        if word[end_index-1] == '-':
+        if word[end_index - 1] == '-':
             if end_index - start_index < 2:
                 continue
-            buffer = word[:end_index-1]
+            buffer = word[:end_index - 1]
             continue
         word = word[start_index:end_index]
         if re.match("^[{}]+-?[{}]*$".format(all_letters, all_letters), word):
@@ -84,18 +84,42 @@ def create_dictionary(words_list):
     return dictionary
 
 
+def isAscii(char):
+    return 32 <= ord(char) <= 128
 
+
+def isSentenceAcceptable(sentence):
+    percent = 10
+    maximal_accepted = 5
+    numbers = 0
+    for char in sentence:
+        if not isAscii(char):
+            return False
+        if char.isdigit():
+            numbers += 1
+
+    accepted = numbers * 100 / len(sentence) < percent and numbers <= maximal_accepted
+    if not accepted:
+        print("USUWAM ZDANIE: + " + sentence)
+    return accepted
+
+
+def delete_sentences_with_many_numbers(sentences_list):
+    return [x for x in sentences_list if isSentenceAcceptable(x)]
+
+
+def print_sentences(sentences_list, old_number_of_sentences):
+    for sentence in sentences_list:
+        print("#" * 80, '\n', sentence, sep="")
+    print("\nNo. sentences before: " + str(old_number_of_sentences) + ", after: " + str(len(sentences_list)))
 
 
 if __name__ == '__main__':
     from tika import parser
-    pdf_path = 'data/Polish/BlochoNalepa.pdf'
-    pdf_text = parser.from_file(pdf_path)
-    raw_text = "Eryk się spina! Czy on taki jest? Czy to tylko ja? Ala kota ma. I ja mam Alę. Cholera! Dziś juwe?"
-    sentences_list = split_to_sentences(join_hyphenated_words(pdf_text['content']))
-    # sentences_list = join_hyphenated_words(pdf_text['content'])
-    print(sentences_list)
-    # print(sentences_list)
-    for sentence in sentences_list:
-        print("#"*80, '\n', sentence)
 
+    pdf_path = 'Polish/BlochoNalepa.pdf'
+    pdf_text = parser.from_file(pdf_path)
+    sentences_list = split_to_sentences(join_hyphenated_words(pdf_text['content']))
+    old_number_of_sentences = len(sentences_list)
+    sentences_list = delete_sentences_with_many_numbers(sentences_list)
+    print_sentences(sentences_list, old_number_of_sentences)
