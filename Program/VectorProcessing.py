@@ -18,8 +18,6 @@ class VectorProcessing:
     def CreateDataSet(self, path="SelectedData.csv"):
         data = pd.read_csv(path)
         dataset =[]
-        print(data.keys())
-        print(len(data.keys()))
         for index, row in data.iterrows():
             X=row[self.xStartColumn:self.xEndColumn]
             XTF=self.CreateTermFrequencyVector(X)

@@ -47,6 +47,8 @@ def Run():
     acc_after_train=clf.testAccuracy(trainX, trainY)
 
     print("abtest, abtrain, aatest, aatrain",acc_before_test, acc_before_train, acc_after_test, acc_after_train)
+
+    clf.save_model()
     
     #clf.train(trainX, trainY, nepochs=50)
     #print("after accuracy for testing sets 2----------------------------------------------------------")
