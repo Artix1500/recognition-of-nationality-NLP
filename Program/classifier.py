@@ -1,6 +1,7 @@
 from keras.models import Sequential
 from keras.layers import Dense
 import numpy as np
+import os
 from VectorProcessing import VectorProcessing as vp
 
 # from loadData import processText
