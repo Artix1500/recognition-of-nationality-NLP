@@ -66,3 +66,16 @@ class Classifier:
         rounded = [round(x[0]) for x in predictions]
         return predictions
 
+    # Gets weights for model from file
+    # Returns true if success
+    def load_model(self, filename):
+        exists = os.path.isfile(filename)
+        if exists:
+            print("loading model")
+            self.model.load_weights(filename)
+
+    # Saves weights of trained model to file->path is path to that file
+    # Returns true if success
+    def save_model(self, filename='model.h5'):
+        print("saving model")
+        self.model.save_weights(filename)

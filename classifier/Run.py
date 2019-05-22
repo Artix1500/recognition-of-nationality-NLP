@@ -37,7 +37,7 @@ def Run():
     print("before accuracy for traing sets----------------------------------------------------------")
     acc_before_train=clf.testAccuracy(trainX, trainY)
 
-    clf.train(trainX, trainY, nepochs=50)
+    clf.train(trainX, trainY, nepochs=30)
 
     
     print("after accuracy for testing sets----------------------------------------------------------")
@@ -48,32 +48,32 @@ def Run():
 
     print("abtest, abtrain, aatest, aatrain",acc_before_test, acc_before_train, acc_after_test, acc_after_train)
     
-    clf.train(trainX, trainY, nepochs=50)
-    print("after accuracy for testing sets 2----------------------------------------------------------")
-    acc_after_test=clf.testAccuracy(testX, testY)
+    #clf.train(trainX, trainY, nepochs=50)
+    #print("after accuracy for testing sets 2----------------------------------------------------------")
+    #acc_after_test=clf.testAccuracy(testX, testY)
 
-    print("after accuracy for traing sets 2-----------------------------------------------------------")
-    acc_after_train=clf.testAccuracy(trainX, trainY)
+    #print("after accuracy for traing sets 2-----------------------------------------------------------")
+    #acc_after_train=clf.testAccuracy(trainX, trainY)
 
-    print("abtest, abtrain, aatest, aatrain 2",acc_after_test, acc_after_train)
+   # print("abtest, abtrain, aatest, aatrain 2",acc_after_test, acc_after_train)
     
-    clf.train(trainX, trainY, nepochs=50)
-    print("after accuracy for testing sets 3----------------------------------------------------------")
-    acc_after_test=clf.testAccuracy(testX, testY)
+   # clf.train(trainX, trainY, nepochs=50)
+   # print("after accuracy for testing sets 3----------------------------------------------------------")
+   # acc_after_test=clf.testAccuracy(testX, testY)
 
-    print("after accuracy for traing sets 3-----------------------------------------------------------")
-    acc_after_train=clf.testAccuracy(trainX, trainY)
+  #  print("after accuracy for traing sets 3-----------------------------------------------------------")
+ #   acc_after_train=clf.testAccuracy(trainX, trainY)
 
-    print("abtest, abtrain, aatest, aatrain 3",acc_after_test, acc_after_train)
+  #  print("abtest, abtrain, aatest, aatrain 3",acc_after_test, acc_after_train)
     
-    clf.train(trainX, trainY, nepochs=50)
-    print("after accuracy for testing sets 4----------------------------------------------------------")
-    acc_after_test=clf.testAccuracy(testX, testY)
+  #  clf.train(trainX, trainY, nepochs=50)
+  #  print("after accuracy for testing sets 4----------------------------------------------------------")
+  #  acc_after_test=clf.testAccuracy(testX, testY)
 
-    print("after accuracy for traing sets 4-----------------------------------------------------------")
-    acc_after_train=clf.testAccuracy(trainX, trainY)
+   # print("after accuracy for traing sets 4-----------------------------------------------------------")
+   # acc_after_train=clf.testAccuracy(trainX, trainY)
 
-    print("abtest, abtrain, aatest, aatrain 4",acc_after_test, acc_after_train)
+  #  print("abtest, abtrain, aatest, aatrain 4",acc_after_test, acc_after_train)
 
 
 
