@@ -7,6 +7,8 @@ italian_regex = '[a-zA-ZàèéìíîòóùúÀÈÉÌÍÎÒÓÙÚ]'
 spanish_regex = '[a-zA-ZáéíñóúüÁÉÍÑÓÚÜ]'
 small_letters_unicode = 'abcdefghijklmnopqrstuvwxyzàâäáąßôöóòéèëêęłïîìíçćùûúüÿńñśźżæœ'
 big_letters_unicode = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÂÄÁĄẞÔÖÓÒÉÈËÊĘŁÏÎÌÍÇĆÙÛÚÜŸŃÑŚŹŻÆŒ'
+english_big_letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+english_small_letters = 'abcdefghijklmnopqrstuvwxyz'
 all_letters = small_letters_unicode + big_letters_unicode
 
 
@@ -74,7 +76,37 @@ def split_to_sentences(raw_text):
     for sentence in interrogative_sentences_split:
         declarative_sentences_split.extend(split_by(sentence, '.'))
 
-    return declarative_sentences_split
+    sentences_list = []
+    for sentence in declarative_sentences_split:
+        if sentence[0] is ' ' and sentence[1] in english_big_letters:
+            sentences_list.append(sentence)
+        elif len(sentences_list) > 0:
+            sentences_list[-1] += sentence
+    return sentences_list
+
+
+def isAscii(char):
+    return 32 <= ord(char) <= 128
+
+
+def isSentenceAcceptable(sentence):
+    percent = 10
+    maximal_accepted = len(sentence)
+    numbers = 0
+    for char in sentence:
+        if not isAscii(char):
+            return False
+        if char.isdigit():
+            numbers += 1
+
+    accepted = numbers * 100 / len(sentence) < percent and numbers <= maximal_accepted
+    if not accepted:
+        print("USUWAM ZDANIE: + " + sentence)
+    return accepted
+
+
+def delete_sentences_with_many_numbers(sentences_list):
+    return [x for x in sentences_list if isSentenceAcceptable(x)]
 
 
 def create_dictionary(words_list):
@@ -84,7 +116,10 @@ def create_dictionary(words_list):
     return dictionary
 
 
-
+def print_sentences(sentences_list, old_number_of_sentences):
+    for sentence in sentences_list:
+        print("#" * 80, '\n', sentence, sep="")
+    print("\nNo. sentences before: " + str(old_number_of_sentences) + ", after: " + str(len(sentences_list)))
 
 
 if __name__ == '__main__':
@@ -94,8 +129,8 @@ if __name__ == '__main__':
     raw_text = "Eryk się spina! Czy on taki jest? Czy to tylko ja? Ala kota ma. I ja mam Alę. Cholera! Dziś juwe?"
     sentences_list = split_to_sentences(join_hyphenated_words(pdf_text['content']))
     # sentences_list = join_hyphenated_words(pdf_text['content'])
-    print(sentences_list)
     # print(sentences_list)
-    for sentence in sentences_list:
+    # print(sentences_list)
+    for sentence in delete_sentences_with_many_numbers(sentences_list):
         print("#"*80, '\n', sentence)
 
