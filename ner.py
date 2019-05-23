@@ -24,5 +24,5 @@ def properNounsOut(rawtext):
 
     return words
 
-# words = properNounsOut("Mark and Derek work at Google")
+# words = properNounsOut("Mark and Derek work at Google, therefore me and other 5463524 people too!")
 # print(words)

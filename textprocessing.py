@@ -1,4 +1,6 @@
 import re
+from tika import parser
+from ner import properNounsOut
 
 french_regex = '[a-zA-ZàâäôéèëêïîçùûüÿæœÀÂÄÔÉÈËÊÏÎŸÇÙÛÜÆŒ]'
 german_regex = '[a-zA-ZäöüßÄÖÜẞ]'
@@ -12,16 +14,16 @@ english_small_letters = 'abcdefghijklmnopqrstuvwxyz'
 all_letters = small_letters_unicode + big_letters_unicode
 
 
-def split_to_words(raw_text):
+def filter_words(words):
     text = []
-    buffer = ""
-    for raw_word in raw_text.split():
+    for raw_word in words:
         if not raw_word:
             continue
-        word = buffer + raw_word.lower()
+        if len(raw_word) < 2:
+            continue
+        word = raw_word.lower()
         start_index, end_index = 0, len(word)
-        buffer = ''
-        if word[end_index-1] in [',', '.', ':', ';', '?', '!']:
+        if word[end_index - 1] in [',', '.', ':', ';', '?', '!']:
             if end_index - start_index < 2:
                 continue
             end_index -= 1
@@ -29,15 +31,10 @@ def split_to_words(raw_text):
             if end_index - start_index < 2:
                 continue
             start_index += 1
-        if word[end_index-1] == ')':
+        if word[end_index - 1] == ')':
             if end_index - start_index < 2:
                 continue
             end_index -= 1
-        if word[end_index-1] == '-':
-            if end_index - start_index < 2:
-                continue
-            buffer = word[:end_index-1]
-            continue
         word = word[start_index:end_index]
         if re.match("^[{}]+-?[{}]*$".format(all_letters, all_letters), word):
             text.append(word)
@@ -90,8 +87,10 @@ def isAscii(char):
 
 
 def isSentenceAcceptable(sentence):
+    if len(sentence) < 25:
+        return False
     percent = 10
-    maximal_accepted = len(sentence)
+    maximal_accepted = 5
     numbers = 0
     for char in sentence:
         if not isAscii(char):
@@ -100,8 +99,8 @@ def isSentenceAcceptable(sentence):
             numbers += 1
 
     accepted = numbers * 100 / len(sentence) < percent and numbers <= maximal_accepted
-    if not accepted:
-        print("USUWAM ZDANIE: + " + sentence)
+    # if not accepted:
+    #     print("USUWAM ZDANIE: + " + sentence)
     return accepted
 
 
@@ -122,15 +121,36 @@ def print_sentences(sentences_list, old_number_of_sentences):
     print("\nNo. sentences before: " + str(old_number_of_sentences) + ", after: " + str(len(sentences_list)))
 
 
-if __name__ == '__main__':
-    from tika import parser
-    pdf_path = 'data/Polish/BlochoNalepa.pdf'
-    pdf_text = parser.from_file(pdf_path)
-    raw_text = "Eryk się spina! Czy on taki jest? Czy to tylko ja? Ala kota ma. I ja mam Alę. Cholera! Dziś juwe?"
-    sentences_list = split_to_sentences(join_hyphenated_words(pdf_text['content']))
-    # sentences_list = join_hyphenated_words(pdf_text['content'])
-    # print(sentences_list)
-    # print(sentences_list)
-    for sentence in delete_sentences_with_many_numbers(sentences_list):
-        print("#"*80, '\n', sentence)
+def deleteWhitespacesOnEdges(sentences_list):
+    return list(map(str.strip, sentences_list))
 
+
+def NER(sentences_list):
+    # for sentence in sentences_list:
+    #     print(properNounsOut(sentence))
+    processed_text = " ".join(sentences_list)
+    words = properNounsOut(processed_text)
+    return words
+
+
+def delete_footers_and_headers(sentences_list):
+    dic = create_dictionary(sentences_list)
+    return [k for k, v in dic.items() if v < 2]
+
+
+def delete_square_brackets(sentence):
+    return "".join(re.split("\[[0-9]*\]", sentence))
+
+
+if __name__ == '__main__':
+    pdf_path = 'Polish/BlochoNalepa.pdf'
+    pdf_text = parser.from_file(pdf_path)
+    sentences_list = split_to_sentences(join_hyphenated_words(pdf_text['content']))
+    old_number_of_sentences = len(sentences_list)
+    sentences_list = delete_sentences_with_many_numbers(sentences_list)
+    sentences_list = deleteWhitespacesOnEdges(sentences_list)
+    sentences_list = delete_footers_and_headers(sentences_list)
+    map(delete_square_brackets, sentences_list)
+    words = NER(sentences_list)
+    words = filter_words(words)
+    print(words)
