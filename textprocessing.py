@@ -19,8 +19,6 @@ def filter_words(words):
     for raw_word in words:
         if not raw_word:
             continue
-        if len(raw_word) < 2:
-            continue
         word = raw_word.lower()
         start_index, end_index = 0, len(word)
         if word[end_index - 1] in [',', '.', ':', ';', '?', '!']:
@@ -36,6 +34,8 @@ def filter_words(words):
                 continue
             end_index -= 1
         word = word[start_index:end_index]
+        if len(word) < 2:
+            continue
         if re.match("^[{}]+-?[{}]*$".format(all_letters, all_letters), word):
             text.append(word)
     return text
@@ -142,8 +142,13 @@ def delete_square_brackets(sentence):
     return "".join(re.split("\[[0-9]*\]", sentence))
 
 
+def print_dictionary(dic):
+    for k, v in dic.items():
+        print(k, v)
+
+
 if __name__ == '__main__':
-    pdf_path = 'Polish/BlochoNalepa.pdf'
+    pdf_path = 'Japan/InabaHosoya.pdf'
     pdf_text = parser.from_file(pdf_path)
     sentences_list = split_to_sentences(join_hyphenated_words(pdf_text['content']))
     old_number_of_sentences = len(sentences_list)
@@ -153,4 +158,5 @@ if __name__ == '__main__':
     map(delete_square_brackets, sentences_list)
     words = NER(sentences_list)
     words = filter_words(words)
-    print(words)
+    final_dict = create_dictionary(words)
+    print_dictionary(final_dict)
