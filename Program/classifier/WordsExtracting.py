@@ -10,7 +10,6 @@ def WordsExtracting(path="ProcessedData.csv", savePath = "SelectedData.csv", fro
    df= data
    keyPath="path_from_file"
    print("sorting")
-    #print(len(data.sum().sort_values(ascending=False)))
    if "path_from_file" in data.keys():
       data = data.drop("path_from_file", axis=1)
    if "Unnamed: 0" in data.keys():

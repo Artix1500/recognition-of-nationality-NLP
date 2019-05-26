@@ -18,8 +18,6 @@ class VectorProcessing:
         data = pd.read_csv(path)
         print(data)
         dataset =[]
-        #print(data.keys())
-        #print(len(data.keys()))
         for index, row in data.iterrows():
             wordCount= row[self.wordCountColumn]
             X=row[self.xStartColumn:self.xEndColumn]
@@ -43,17 +41,12 @@ class VectorProcessing:
 
     def CreateTermFrequencyVector(self, vector, wordCount):
         record = vector
-        print("====================================================================================================================")
-        print(vector)
-        print(wordCount)
         if wordCount is 0:
             print("Wordcount is 0")
             return None
         if wordCount is None:
             print("WORDCOUNT IS NONE!!!")
             return None
-       # print(wordCount)
-       # print(record)
         vectorTF = list(map(lambda x: x / wordCount, record))
         return vectorTF
 
@@ -64,7 +57,6 @@ class VectorProcessing:
 
     # returns splited dataset from path, trainSetRate=trainSetLength/dataSetSize
     def GetData(self, path = "SelectedData.csv", trainSetRate = 0.6):
-        # print(type(self))
         dataSet = self.CreateDataSet(path)
         self.ShuffleData(dataSet)
         middlePoint = (int)(len(dataSet)*trainSetRate)
