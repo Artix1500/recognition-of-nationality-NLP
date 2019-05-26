@@ -30,10 +30,11 @@ def ClearData(pathFrom="data.csv", pathTo="ProcessedData.csv", withLemmatization
 
     #add column with wordCount
     print("adding wordCount Column")
-    data['WordCount'] = data.sum(axis=1, skipna=True)
+    data['Word_Count'] = data.sum(axis=1, skipna=True)
 
     print("adding the path_nationality column")
-    data['path_nationality:']=df['path_nationality:']
+    keyPath = 'path_from_file'
+    data['path_from_file']=df[keyPath]
 
     print("saving to file")
     data.to_csv(pathTo)
@@ -41,4 +42,4 @@ def ClearData(pathFrom="data.csv", pathTo="ProcessedData.csv", withLemmatization
 
 
 if __name__ == '__main__':
-    ClearData(withLemmatization=False)
+    ClearData(withLemmatization=True)

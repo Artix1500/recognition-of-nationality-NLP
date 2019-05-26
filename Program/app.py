@@ -17,7 +17,7 @@ from Program.classifier.VectorProcessing import VectorProcessing
 from Program.preprocessing.ClearData import ClearData
 from Program.classifier.variables import NATIONALITIES
 from Program.classifier.Run  import getVector
-from Program.classifier.WordsExtracting import WordsExtracting
+from Program.classifier.WordsExtracting import TakeMatchingWords
 
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -118,7 +118,7 @@ def updateCSV(existingWords, wordQuantitiesMatrix, paths, pathToCSV):
     rows = []
     # if ',' + bla it needs to be added in numbers to
    # firstRow = ',' + ','.join(existingWords)
-    firstRow = "path_nationality:," +','.join(existingWords)
+    firstRow = "path_from_file," +','.join(existingWords)
     rows.append(firstRow)
     global LineCount
     for i in range(wordQuantitiesMatrix.shape[0]):
@@ -147,7 +147,7 @@ def updateData(file, pathToCSV="data.csv"):
 
 
 if __name__ == "__main__":
-    wordsLen =1000
+    wordsLen = 999
    # file = input('I need the name of your file: ')
     file="data/British/somepdf.pdf"
     print(file)
@@ -156,22 +156,22 @@ if __name__ == "__main__":
     # data.csv -> ProcessedData.csv
     ClearData(withLemmatization=True)
     # ProcessedData.csv -> SelectedData.csv
-    WordsExtracting()
+    #WordsExtracting()
+    TakeMatchingWords()
     # create classifier
     clf = Classifier(inputSize=wordsLen, outputSize=len(NATIONALITIES))
     # load trained model
     clf.load_model("model.h5")
 
     # SelectedData.csv -> vect
-    vp = VectorProcessing(wordCountColumn=-1, xStartColumn=1, xEndColumn=-2, pathColumn=-2 )
+    vp = VectorProcessing(wordCountColumn=-1, xStartColumn=2, xEndColumn=-2, pathColumn=-2 )
     vect = vp.GetVector()
+    print(vect)
     vectX = vect[0]['X']
 
     
     score = clf.predict(vectX)
     
-    #print(NATIONALITIES)
-    #print(score)
     for key, value in NATIONALITIES.items():
         if value==np.argmax(score):
             print("predicted nationality: ", key)

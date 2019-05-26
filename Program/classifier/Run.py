@@ -4,7 +4,7 @@ from Program.classifier.VectorProcessing import VectorProcessing as vp
 from Program.classifier.variables import NATIONALITIES
 
 def Run():
-    clf = Classifier(1000,len(NATIONALITIES))
+    clf = Classifier(999,len(NATIONALITIES))
     clf.compileModel()
     trainData , testData = getData()
 
@@ -16,6 +16,7 @@ def Run():
         tempVector[num] = 1
         trainY.append(tempVector)
     trainY = np.array(trainY)
+
 
 
     testX = np.array(list(map(lambda x: x['X'][0], testData)))
@@ -58,7 +59,7 @@ def Run():
    # print(testY[0])
 
 def getData(path="SelectedData.csv"):
-    vectorProcesser= vp(wordCountColumn=1, xStartColumn=2,xEndColumn=-1,pathColumn=-1)
+    vectorProcesser= vp(wordCountColumn=1, xStartColumn=3,xEndColumn=-1,pathColumn=-1)
     return vectorProcesser.GetData(path)
 
 def getVector(path="SelectedData.csv"):

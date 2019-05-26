@@ -16,13 +16,15 @@ class VectorProcessing:
     # Term Frequencies
     def CreateDataSet(self, path="SelectedData.csv"):
         data = pd.read_csv(path)
+        print(data)
         dataset =[]
         #print(data.keys())
         #print(len(data.keys()))
         for index, row in data.iterrows():
-            print("iteration ", index)
+            wordCount= row[self.wordCountColumn]
             X=row[self.xStartColumn:self.xEndColumn]
-            XTF=self.CreateTermFrequencyVector(X)
+            print(X)
+            XTF=self.CreateTermFrequencyVector(X,wordCount)
             if XTF is None:
                 continue
             # not sure if Y shouldn't be reshaped as well
@@ -39,9 +41,11 @@ class VectorProcessing:
         return
 
 
-    def CreateTermFrequencyVector(self, vector):
+    def CreateTermFrequencyVector(self, vector, wordCount):
         record = vector
-        wordCount = vector[self.wordCountColumn]
+        print("====================================================================================================================")
+        print(vector)
+        print(wordCount)
         if wordCount is 0:
             print("Wordcount is 0")
             return None
