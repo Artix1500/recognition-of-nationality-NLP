@@ -2,23 +2,25 @@ import pandas as pd
 import random
 import numpy as np
 
-# dictionary of our nationalities
-NATIONALITIES= {"British": 0, "Chinese": 1, "French": 2, "Polish": 3, "Russian": 4}
+from Program.classifier.variables import NATIONALITIES
 
 
 class VectorProcessing:
-    def __init__(self):
-        self.wordCountColumn = 1
-        self.xStartColumn=3
-        self.xEndColumn = -1
-        self.pathColumn = -1
+    def __init__(self, wordCountColumn =1, xStartColumn =3, xEndColumn=-1, pathColumn=-1):
+        self.wordCountColumn = wordCountColumn
+        self.xStartColumn=xStartColumn
+        self.xEndColumn = xEndColumn
+        self.pathColumn = pathColumn
 
     # returns dataset witch is list of dictionaries
     # Term Frequencies
     def CreateDataSet(self, path="SelectedData.csv"):
         data = pd.read_csv(path)
         dataset =[]
+        #print(data.keys())
+        #print(len(data.keys()))
         for index, row in data.iterrows():
+            print("iteration ", index)
             X=row[self.xStartColumn:self.xEndColumn]
             XTF=self.CreateTermFrequencyVector(X)
             if XTF is None:
@@ -46,6 +48,8 @@ class VectorProcessing:
         if wordCount is None:
             print("WORDCOUNT IS NONE!!!")
             return None
+       # print(wordCount)
+       # print(record)
         vectorTF = list(map(lambda x: x / wordCount, record))
         return vectorTF
 
@@ -63,8 +67,7 @@ class VectorProcessing:
         trainData = dataSet[0:middlePoint]
         testData = dataSet[middlePoint:(len(dataSet)-1)]
         return trainData , testData
-
-
-    # inverse frequency
-    # topics
-
+    
+    def GetVector(self, path ="SelectedData.csv"):
+        return self.CreateDataSet(path)
+    

@@ -12,7 +12,12 @@ from nltk import WordNetLemmatizer
 import textprocessing as tp
 import ner
 from tika import parser
-from classifier import Classifier
+from Program.classifier.classifier import Classifier
+from Program.classifier.VectorProcessing import VectorProcessing
+from Program.preprocessing.ClearData import ClearData
+from Program.classifier.variables import NATIONALITIES
+from Program.classifier.Run  import getVector
+from Program.classifier.WordsExtracting import WordsExtracting
 
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -109,23 +114,25 @@ def addNewRows(newFilesDicts, existingWords, wordQuantitiesMatrix):
 
 
 
-def updateCSV(existingWords, wordQuantitiesMatrix, pathToCsv):
+def updateCSV(existingWords, wordQuantitiesMatrix, paths, pathToCSV):
     rows = []
-    firstRow = ',' + ','.join(existingWords)
+    # if ',' + bla it needs to be added in numbers to
+   # firstRow = ',' + ','.join(existingWords)
+    firstRow = "path_nationality:," +','.join(existingWords)
     rows.append(firstRow)
     global LineCount
     for i in range(wordQuantitiesMatrix.shape[0]):
         LineCount = LineCount + 1
-        quantities = ','.join(map(str, wordQuantitiesMatrix.astype(int)[i, :].tolist()))
+        quantities = paths[i] +',' + ','.join(map(str, wordQuantitiesMatrix.astype(int)[i, :].tolist()))
         rows.append(quantities)
     finalCSVContent = '\n'.join(rows)
-
-    with codecs.open(pathToCsv, 'w', 'utf-8') as csvFile:
+ 
+    with codecs.open(pathToCSV, 'w', 'utf-8') as csvFile:
         csvFile.write(finalCSVContent)
 
 
 
-def updateData(file):
+def updateData(file, pathToCSV="data.csv"):
 
     rowsToBeAdded = [file]
     existingWords = []
@@ -135,87 +142,36 @@ def updateData(file):
         newFilesDicts = readPDFsFromNewFiles(rowsToBeAdded)
         existingWords, wordQuantitiesMatrix = addNewRows(newFilesDicts, existingWords, wordQuantitiesMatrix)
 
-    updateCSV(existingWords, wordQuantitiesMatrix, "data.csv")
 
-
-def dataLemmatization(data):
-    newWords = []
-    allWords = data.columns
-    newQuantityDF = pd.DataFrame()
-    lemmatizer = WordNetLemmatizer()
-    i = 0
-
-    if "Unnamed: 0" in allWords:
-        newQuantityDF["Unnamed: 0"] = data["Unnamed: 0"]
-        i += 1
-    if "Word_Count" in allWords:
-        newQuantityDF["Word_Count"] = data["Word_Count"]
-        i += 1
-
-    for word in allWords[i:]:
-        lemmatizedWord = lemmatizer.lemmatize(word)
-        if lemmatizedWord in newWords:
-            newQuantityDF[lemmatizedWord] += data[word]
-        else:
-            newWords.append(lemmatizedWord)
-            newQuantityDF[lemmatizedWord] = data[word]
-
-    return newQuantityDF
-
-
-def ClearData(pathFrom="data.csv", pathTo="ProcessedData.csv", withLemmatization=False):
-    df = pd.DataFrame()
-
-    data = df
-    for chunk in pd.read_csv(pathFrom,  chunksize=100):
-        data = pd.concat([data, chunk])
-
-    data = dataLemmatization(data)
-
-    return data
+    updateCSV(existingWords, wordQuantitiesMatrix, paths=rowsToBeAdded,  pathToCSV=pathToCSV)
 
 
 if __name__ == "__main__":
-    print('Hello ! ')
-    file = input('I need the name of your file: ')
+    wordsLen =1000
+   # file = input('I need the name of your file: ')
+    file="data/British/somepdf.pdf"
     print(file)
+    # I think it reads from the pdf
     updateData(file)
-    dataFromPdf = ClearData()
-
-    clf = Classifier(2, 999, 5)
-    clf.compileModel()
+    # data.csv -> ProcessedData.csv
+    ClearData(withLemmatization=True)
+    # ProcessedData.csv -> SelectedData.csv
+    WordsExtracting()
+    # create classifier
+    clf = Classifier(inputSize=wordsLen, outputSize=len(NATIONALITIES))
+    # load trained model
     clf.load_model("model.h5")
 
-    df = pd.DataFrame()
+    # SelectedData.csv -> vect
+    vp = VectorProcessing(wordCountColumn=-1, xStartColumn=1, xEndColumn=-2, pathColumn=-2 )
+    vect = vp.GetVector()
+    vectX = vect[0]['X']
 
-    dataForAlgorithm = df
-    for chunk in pd.read_csv("dataForAlgorithm.csv",  chunksize=100 , nrows=1):
-        dataForAlgorithm = pd.concat([dataForAlgorithm, chunk])
-
-
-
-    dataForAlgorithm = dataForAlgorithm.drop("Unnamed: 0", axis=1)
-
-    dataForAlgorithm = dataForAlgorithm.drop("Unnamed: 0.1", axis=1)
-
-    dataForAlgorithm = dataForAlgorithm.drop("path_from_file", axis=1)
-
-    vect = []
-
-    for key in dataForAlgorithm.keys():
-        if key in dataFromPdf.keys():
-            vect.append(dataFromPdf[key][0])
-        else:
-            vect.append(0)
-
-
-    vect = vect[1:1000]
-
-    vect = [[vect]]
-
-    score = clf.predict(vect)
-
-    NATIONALITIES = ["0: British", "1: Chinese", "2: French", "3: Polish", "4: Russian"]
-
-    print(NATIONALITIES)
-    print(score)
+    
+    score = clf.predict(vectX)
+    
+    #print(NATIONALITIES)
+    #print(score)
+    for key, value in NATIONALITIES.items():
+        if value==np.argmax(score):
+            print("predicted nationality: ", key)

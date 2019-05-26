@@ -1,10 +1,10 @@
-from classifier import Classifier
+from Program.classifier.classifier import Classifier
 import numpy as np
-from VectorProcessing import VectorProcessing as vp
-
+from Program.classifier.VectorProcessing import VectorProcessing as vp
+from Program.classifier.variables import NATIONALITIES
 
 def Run():
-    clf = Classifier(2,999,5)
+    clf = Classifier(1000,len(NATIONALITIES))
     clf.compileModel()
     trainData , testData = getData()
 
@@ -19,6 +19,7 @@ def Run():
 
 
     testX = np.array(list(map(lambda x: x['X'][0], testData)))
+    print(testX)
     testY = []
     temp = np.array(list(map(lambda x: x['Y'], testData)))
     for num in temp:
@@ -50,37 +51,6 @@ def Run():
 
     clf.save_model()
     
-    #clf.train(trainX, trainY, nepochs=50)
-    #print("after accuracy for testing sets 2----------------------------------------------------------")
-    #acc_after_test=clf.testAccuracy(testX, testY)
-
-    #print("after accuracy for traing sets 2-----------------------------------------------------------")
-    #acc_after_train=clf.testAccuracy(trainX, trainY)
-
-   # print("abtest, abtrain, aatest, aatrain 2",acc_after_test, acc_after_train)
-    
-   # clf.train(trainX, trainY, nepochs=50)
-   # print("after accuracy for testing sets 3----------------------------------------------------------")
-   # acc_after_test=clf.testAccuracy(testX, testY)
-
-  #  print("after accuracy for traing sets 3-----------------------------------------------------------")
- #   acc_after_train=clf.testAccuracy(trainX, trainY)
-
-  #  print("abtest, abtrain, aatest, aatrain 3",acc_after_test, acc_after_train)
-    
-  #  clf.train(trainX, trainY, nepochs=50)
-  #  print("after accuracy for testing sets 4----------------------------------------------------------")
-  #  acc_after_test=clf.testAccuracy(testX, testY)
-
-   # print("after accuracy for traing sets 4-----------------------------------------------------------")
-   # acc_after_train=clf.testAccuracy(trainX, trainY)
-
-  #  print("abtest, abtrain, aatest, aatrain 4",acc_after_test, acc_after_train)
-
-
-
-
-
 
    # clf.evaluate(testX, testY)
    
@@ -88,7 +58,13 @@ def Run():
    # print(testY[0])
 
 def getData(path="SelectedData.csv"):
-    vectorProcesser= vp()
+    vectorProcesser= vp(wordCountColumn=1, xStartColumn=2,xEndColumn=-1,pathColumn=-1)
     return vectorProcesser.GetData(path)
 
-Run()
+def getVector(path="SelectedData.csv"):
+    vectorProcesser = vp()
+    return vectorProcesser.GetData(path)
+
+
+if __name__ == '__main__':
+    Run()
