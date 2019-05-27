@@ -148,8 +148,8 @@ def updateData(file, pathToCSV="data.csv"):
 
 if __name__ == "__main__":
     wordsLen = 999
-   # file = input('I need the name of your file: ')
-    file="data/British/somepdf.pdf"
+    file = input('I need the name of your file: ')
+    #file="data/British/somepdf.pdf"
     print(file)
     # I think it reads from the pdf
     updateData(file)
@@ -171,7 +171,7 @@ if __name__ == "__main__":
 
     
     score = clf.predict(vectX)
-    
+    print(score)
     for key, value in NATIONALITIES.items():
         if value==np.argmax(score):
             print("predicted nationality: ", key)

@@ -16,12 +16,12 @@ class VectorProcessing:
     # Term Frequencies
     def CreateDataSet(self, path="SelectedData.csv"):
         data = pd.read_csv(path)
-        print(data)
+        #print(data)
         dataset =[]
         for index, row in data.iterrows():
             wordCount= row[self.wordCountColumn]
             X=row[self.xStartColumn:self.xEndColumn]
-            print(X)
+            #print(X)
             XTF=self.CreateTermFrequencyVector(X,wordCount)
             if XTF is None:
                 continue

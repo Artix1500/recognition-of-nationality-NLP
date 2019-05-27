@@ -52,12 +52,12 @@ def Run():
     print("accuracy after trainning of the test data: ", acc_after_test)
     print("accuracy after trainning of the train data: ", acc_after_train)
     
-    #save weights
+    #save weightscd
     clf.save_model()
     
 
 def getData(path="SelectedData.csv"):
-    vectorProcesser= vp(wordCountColumn=1, xStartColumn=3,xEndColumn=-1,pathColumn=-1)
+    vectorProcesser= vp(wordCountColumn=1, xStartColumn=2,xEndColumn=-1,pathColumn=-1)
     return vectorProcesser.GetData(path)
 
 def getVector(path="SelectedData.csv"):

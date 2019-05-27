@@ -39,6 +39,7 @@ def TakeMatchingWords(pathNewCSV = "ProcessedData.csv", savePath = "SelectedData
 
 
    print("droping path and word count")
+   
    dataNew = dataNew.drop("path_from_file", axis=1)
    dataNew = dataNew.drop("Word_Count", axis=1)
    if "path_from_file" in dataOld.keys():

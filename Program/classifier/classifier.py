@@ -16,6 +16,7 @@ class Classifier:
         self.inputSize = inputSize
         self.outputSize = outputSize
         self.model = self.buildModel()
+        self.compileModel()
 
     # builds a model, the hidden layers' size can be customized
     def buildModel(self, layer1Size=10, layer2Size=10):
