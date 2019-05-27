@@ -12,22 +12,25 @@ def dataLemmatization(data):
     lemmatizer = WordNetLemmatizer()
     i = 0
 
+    #to juz nie powinno byc potrzebne
     if "Unnamed: 0" in allWords:
         newQuantityDF["Unnamed: 0"] = data["Unnamed: 0"]
         i += 1
     if "Word_Count" in allWords:
         newQuantityDF["Word_Count"] = data["Word_Count"]
         i += 1
+    # ^^
+
 
     for word in allWords[i:]:
-        print("New Word "+word)
+       # print("New Word "+word)
         lemmatizedWord = lemmatizer.lemmatize(word)
-        print("lemmatized word " + word)
+        #print("lemmatized word " + word)
         if lemmatizedWord in newWords:
-            print("is already in set")
+            #print("is already in set")
             newQuantityDF[lemmatizedWord] += data[word]
         else:
-            print("is not")
+           # print("is not")
             newWords.append(lemmatizedWord)
             newQuantityDF[lemmatizedWord] = data[word]
 

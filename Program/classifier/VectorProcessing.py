@@ -2,25 +2,28 @@ import pandas as pd
 import random
 import numpy as np
 
-# dictionary of our nationalities
-NATIONALITIES= {"British": 0, "Chinese": 1, "French": 2, "Polish": 3, "Russian": 4}
+from Program.classifier.variables import NATIONALITIES
 
 
 class VectorProcessing:
-    def __init__(self):
-        self.wordCountColumn = 1
-        self.xStartColumn=3
-        self.xEndColumn = -1
-        self.pathColumn = -1
+    def __init__(self, wordCountColumn =1, xStartColumn =3, xEndColumn=-1, pathColumn=-1):
+        self.wordCountColumn = wordCountColumn
+        self.xStartColumn=xStartColumn
+        # under this index is no word/not included
+        self.xEndColumn = xEndColumn 
+        self.pathColumn = pathColumn
 
     # returns dataset witch is list of dictionaries
     # Term Frequencies
     def CreateDataSet(self, path="SelectedData.csv"):
         data = pd.read_csv(path)
+        #print(data)
         dataset =[]
         for index, row in data.iterrows():
+            wordCount= row[self.wordCountColumn]
             X=row[self.xStartColumn:self.xEndColumn]
-            XTF=self.CreateTermFrequencyVector(X)
+            #print(X)
+            XTF=self.CreateTermFrequencyVector(X,wordCount)
             if XTF is None:
                 continue
             # not sure if Y shouldn't be reshaped as well
@@ -37,9 +40,8 @@ class VectorProcessing:
         return
 
 
-    def CreateTermFrequencyVector(self, vector):
+    def CreateTermFrequencyVector(self, vector, wordCount):
         record = vector
-        wordCount = vector[self.wordCountColumn]
         if wordCount is 0:
             print("Wordcount is 0")
             return None
@@ -56,15 +58,13 @@ class VectorProcessing:
 
     # returns splited dataset from path, trainSetRate=trainSetLength/dataSetSize
     def GetData(self, path = "SelectedData.csv", trainSetRate = 0.6):
-        # print(type(self))
         dataSet = self.CreateDataSet(path)
         self.ShuffleData(dataSet)
         middlePoint = (int)(len(dataSet)*trainSetRate)
         trainData = dataSet[0:middlePoint]
         testData = dataSet[middlePoint:(len(dataSet)-1)]
         return trainData , testData
-
-
-    # inverse frequency
-    # topics
-
+    
+    def GetVector(self, path ="SelectedData.csv"):
+        return self.CreateDataSet(path)
+    

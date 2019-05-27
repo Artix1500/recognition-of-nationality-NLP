@@ -1,7 +1,8 @@
 from keras.models import Sequential
 from keras.layers import Dense
 import numpy as np
-from VectorProcessing import VectorProcessing as vp
+import os
+from Program.classifier.VectorProcessing import VectorProcessing as vp
 
 # from loadData import processText
 
@@ -10,11 +11,12 @@ class Classifier:
     # batchSize - how many samples at once
     # inputSize - how long input vector
     # outputSize - how big output - how many nationalities
-    def __init__(self, batchSize, inputSize, outputSize):
-        self.batchSize = batchSize
+    def __init__(self, inputSize, outputSize):
+        #self.batchSize = batchSize
         self.inputSize = inputSize
         self.outputSize = outputSize
         self.model = self.buildModel()
+        self.compileModel()
 
     # builds a model, the hidden layers' size can be customized
     def buildModel(self, layer1Size=10, layer2Size=10):
