@@ -52,7 +52,7 @@ def Run():
     print("accuracy after trainning of the test data: ", acc_after_test)
     print("accuracy after trainning of the train data: ", acc_after_train)
     
-    #save weightscd
+    #save weights
     clf.save_model()
     
 

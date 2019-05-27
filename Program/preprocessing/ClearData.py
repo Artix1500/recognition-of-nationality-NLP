@@ -4,8 +4,9 @@ from Program.preprocessing.lemmatization import dataLemmatization
 # ClearData clears data from pathFrom csv and saves processed csv to pathTo
 # withDropping - drops columns with less than minCount summed words 
 # withLemmatization - words lemmatization on
+# OUT: words,wordCount, paths
 # does return anything
-def ClearData(pathFrom="data.csv", pathTo="ProcessedData.csv", withLemmatization=False,  withDropping = False, minCount =10):
+def ClearData(pathFrom="data.csv", pathTo="ProcessedData.csv", withLemmatization=False,  withDropping = False, minCount =10, xStartColumn =1, xEndColumn=-1, pathColumn=0):
     data = pd.DataFrame()
 
     print("Reading data")
@@ -14,8 +15,8 @@ def ClearData(pathFrom="data.csv", pathTo="ProcessedData.csv", withLemmatization
 
     df=data
 
-   # print("dropping first column")
-   # data = data.drop("Unnamed: 0", axis=1)
+
+    data = data[xStartColumn:xEndColumn]
 
     if withLemmatization:
         print("Lemmatization")
@@ -31,13 +32,12 @@ def ClearData(pathFrom="data.csv", pathTo="ProcessedData.csv", withLemmatization
     #add column with wordCount
     print("adding wordCount Column")
     data['Word_Count'] = data.sum(axis=1, skipna=True)
-
+    
     print("adding the path_nationality column")
-    keyPath = 'path_from_file'
-    data['path_from_file']=df[keyPath]
+    data['path_from_file']= df[(list(df.columns))[pathColumn]]
 
     print("saving to file")
-    data.to_csv(pathTo)
+    data.to_csv(pathTo, index=False)
 
 
 
