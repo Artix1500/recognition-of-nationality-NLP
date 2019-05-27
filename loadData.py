@@ -8,6 +8,7 @@ import codecs
 import textprocessing as tp
 import ner
 from tika import parser
+from sentences_processor import process_PDF_content
 
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -60,7 +61,8 @@ def readPDFsFromNewFiles(rowsToBeAdded):
         try:
             FileCount = FileCount + 1
             text = parser.from_file(newFile)
-            newFilesDicts[newFile] = processText(text['content'])
+            # newFilesDicts[newFile] = processText(text['content'])
+            newFilesDicts[newFile] = process_PDF_content(text['content'])
             print(str(FileCount) + '\t')
         except KeyError:
             print("KEYERROR in " + newFile)

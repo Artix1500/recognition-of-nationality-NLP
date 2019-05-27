@@ -1,4 +1,7 @@
 import re
+import raw_text_processor as rtproc
+from tika import parser
+from ner import properNounsOut
 
 small_letters_unicode = 'abcdefghijklmnopqrstuvwxyzàâäáąßôöóòéèëêęłïîìíçćùûúüÿńñśźżæœ'
 big_letters_unicode = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÂÄÁĄẞÔÖÓÒÉÈËÊĘŁÏÎÌÍÇĆÙÛÚÜŸŃÑŚŹŻÆŒ'
@@ -64,15 +67,7 @@ def sentence_statistic(sentence):
             digits += 1
         else:
             other_ascii_characters += 1
-    '''
-    statistic = namedtuple('statistic', [
-        'length',
-        'non_ASCII_characters',
-        'small_letters',
-        'big_letters',
-        'digits',
-        'other_ASCII_characters'])
-    '''
+
     return [length, 100 * non_ascii_characters / length, 100 * small_letters / length, 100 * big_letters / length,
             100 * digits / length, 100 * other_ascii_characters / length]
 
@@ -110,47 +105,24 @@ def print_sentences(sentences_list):
         print("#" * 80, sentence, sep="\n")
 
 
-if __name__ == '__main__':
-    import raw_text_processor as rtproc
-    from tika import parser
+def NER(sentences_list):
+    processed_text = " ".join(sentences_list)
+    words = properNounsOut(processed_text)
+    return words
 
-    pdf_path = 'Polish/BlochoNalepa.pdf'
-    pdf_text = parser.from_file(pdf_path)
-    text = pdf_text['content']
+
+def print_dictionary(dic):
+    for k, v in dic.items():
+        print(k, v)
+
+
+def process_PDF_content(text):
     text = rtproc.join_hyphenated_words(text)
     text = rtproc.delete_square_brackets(text)
     sent = rtproc.split_to_sentences(text)
     sent = select_correct_sentences(sent, sentence_verifier)
-    # print_sentences(sent)
-
-    from ner import properNounsOut
-
-
-    def NER(sentences_list):
-        processed_text = " ".join(sentences_list)
-        words = properNounsOut(processed_text)
-        return words
-
-
-    def print_dictionary(dic):
-        for k, v in dic.items():
-            print(k, v)
-
-
     words_without_proper_names = NER(sent)
     words = filter_words(words_without_proper_names)
     final_dict = create_dictionary(words)
-    print_dictionary(final_dict)
-
-    '''
-    sentences_list = split_to_sentences(join_hyphenated_words(pdf_text['content']))
-    old_number_of_sentences = len(sentences_list)
-    sentences_list = delete_sentences_with_many_numbers(sentences_list)
-    sentences_list = deleteWhitespacesOnEdges(sentences_list)
-    sentences_list = delete_footers_and_headers(sentences_list)
-    map(delete_square_brackets, sentences_list)
-    words = NER(sentences_list)
-    words = filter_words(words)
-    final_dict = create_dictionary(words)
-    print_dictionary(final_dict)
-    '''
+    return final_dict
+    # print_dictionary(final_dict)
