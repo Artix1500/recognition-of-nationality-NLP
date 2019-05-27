@@ -3,51 +3,60 @@ import pandas as pd
 
 # WordsExtracting - extracts the toCutNumnber-fromCutNumber words that appear the most often
 # gets path csv and saves csv to savePath
-def WordsExtracting(path="ProcessedData.csv", savePath = "SelectedData.csv", fromCutNumber=0, toCutNumber=999):
+# xendcolumn not included -> if you want the last piece as well =None
+def WordsExtracting(path="../preprocessing/ProcessedData.csv", savePath = "SelectedData.csv", fromCutNumber=0, toCutNumber=999,wordCountColumn=-1, xStartColumn =1, xEndColumn=-1, pathColumn=0):
 
    print("Reading data")
    data = pd.read_csv(path)
    df= data
-   keyPath="path_from_file"
-   print("sorting")
-   if "path_from_file" in data.keys():
-      data = data.drop("path_from_file", axis=1)
-   if "Unnamed: 0" in data.keys():
-      keyPath="Unnamed: 0"
-      data = data.drop("Unnamed: 0", axis=1)
-   data = data.drop("Word_Count", axis=1)
 
+   if xEndColumn is not None:
+      data = data.iloc[:, xStartColumn:xEndColumn]
+   else:
+      data = data.iloc[:, xStartColumn:]
+  
+
+   print("sorting")
+   
    data = data.reindex(data.sum().sort_values(ascending=False).index, axis=1)
 
    print("cutting the words")
    data = data.iloc[:, fromCutNumber:toCutNumber]
 
+   
+   data['Word_Count'] = df[(list(df.columns))[wordCountColumn]]
+   data['path_from_file'] = df[(list(df.columns))[pathColumn]]
+   
    print("saving to csv file")
-   data['path_from_file'] = df[keyPath]
-   data['Word_Count'] = df['Word_Count']
-
-   data.to_csv(savePath)
+   data.to_csv(savePath, index=False)
   
 
-def TakeMatchingWords(pathNewCSV = "ProcessedData.csv", savePath = "SelectedData.csv", trainedDataPath = "classifier/SelectedData.csv"):
+# parameters for column indeces
+# wordCountColumnNew - where in pathNewCSV is the Word_Count column 
+# pathColumnNew - where is the path column
+# xStartColumnNew - where the words start in the new file
+# xEndColumnNew - where the words end in the new file + 1 (not included) if you want the last piece as well =None )
+# Old by analogy
+
+def TakeMatchingWords(pathNewCSV = "ProcessedData.csv", savePath = "SelectedData.csv", trainedDataPath = "classifier/SelectedData.csv",wordCountColumnNew=-1, xStartColumnNew =1, xEndColumnNew=-1, pathColumnNew=0, xStartColumnOld=1, xEndColumnOld=-1):
    print("Reading new data")
    dataNew = pd.read_csv(pathNewCSV)
    dfNew= dataNew
-
+   
    print("reading old data")
    dataOld= pd.read_csv(trainedDataPath)
 
 
    print("droping path and word count")
-   
-   dataNew = dataNew.drop("path_from_file", axis=1)
-   dataNew = dataNew.drop("Word_Count", axis=1)
-   if "path_from_file" in dataOld.keys():
-      dataOld = dataOld.drop("path_from_file", axis=1)
-   dataOld = dataOld.drop("Word_Count", axis=1)
-   if "Unnamed: 0" in dataOld.keys():
-      dataNew = dataNew.drop("Unnamed: 0", axis=1)
-      
+   if xEndColumnOld is not None:
+      dataOld = dataOld.iloc[:, xStartColumnOld:xEndColumnOld]
+   else:
+      dataOld = dataOld.iloc[:, xStartColumnOld:]
+
+   if xEndColumnNew is not None:
+      dataNew = dataNew.iloc[:, xStartColumnNew:xEndColumnNew]
+   else:
+      dataNew = dataNew.iloc[:, xStartColumnNew:]
 
    print("take the matching words")
    # wez slowa dataOld i wsadz do dataNewToSave
@@ -64,11 +73,11 @@ def TakeMatchingWords(pathNewCSV = "ProcessedData.csv", savePath = "SelectedData
          dataNewToSave[key] = [0 for i in range(columnLength)]
 
 
-   print("saving to csv file")
-   dataNewToSave['path_from_file'] = dfNew['path_from_file']
-   dataNewToSave['Word_Count'] = dfNew['Word_Count']
+   dataNewToSave['Word_Count'] = dfNew[(list(dfNew.columns))[wordCountColumnNew]]
+   dataNewToSave['path_from_file'] = dfNew[(list(dfNew.columns))[pathColumnNew]]
 
-   dataNewToSave.to_csv(savePath)
+   print("saving to csv file")
+   dataNewToSave.to_csv(savePath, index=False)
 
 
 if __name__ == '__main__':

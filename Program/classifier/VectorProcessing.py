@@ -9,7 +9,8 @@ class VectorProcessing:
     def __init__(self, wordCountColumn =1, xStartColumn =3, xEndColumn=-1, pathColumn=-1):
         self.wordCountColumn = wordCountColumn
         self.xStartColumn=xStartColumn
-        self.xEndColumn = xEndColumn
+        # under this index is no word/not included
+        self.xEndColumn = xEndColumn 
         self.pathColumn = pathColumn
 
     # returns dataset witch is list of dictionaries

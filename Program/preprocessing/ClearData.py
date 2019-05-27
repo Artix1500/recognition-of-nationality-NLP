@@ -6,7 +6,8 @@ from Program.preprocessing.lemmatization import dataLemmatization
 # withLemmatization - words lemmatization on
 # OUT: words,wordCount, paths
 # does return anything
-def ClearData(pathFrom="data.csv", pathTo="ProcessedData.csv", withLemmatization=False,  withDropping = False, minCount =10, xStartColumn =1, xEndColumn=-1, pathColumn=0):
+#xEndColumn not included, if it is till the end -> None
+def ClearData(pathFrom="data.csv", pathTo="ProcessedData.csv", withLemmatization=False,  withDropping = False, minCount =10, xStartColumn =1, xEndColumn=None, pathColumn=0):
     data = pd.DataFrame()
 
     print("Reading data")
@@ -15,8 +16,10 @@ def ClearData(pathFrom="data.csv", pathTo="ProcessedData.csv", withLemmatization
 
     df=data
 
-
-    data = data[xStartColumn:xEndColumn]
+    if xEndColumn is not None:
+        data = data.iloc[:, xStartColumn:xEndColumn]
+    else:
+        data = data.iloc[:, xStartColumn:]
 
     if withLemmatization:
         print("Lemmatization")
