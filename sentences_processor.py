@@ -1,5 +1,38 @@
 import re
 
+small_letters_unicode = 'abcdefghijklmnopqrstuvwxyzàâäáąßôöóòéèëêęłïîìíçćùûúüÿńñśźżæœ'
+big_letters_unicode = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÂÄÁĄẞÔÖÓÒÉÈËÊĘŁÏÎÌÍÇĆÙÛÚÜŸŃÑŚŹŻÆŒ'
+english_big_letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+english_small_letters = 'abcdefghijklmnopqrstuvwxyz'
+all_letters = small_letters_unicode + big_letters_unicode
+
+
+def filter_words(words):
+    text = []
+    for raw_word in words:
+        if not raw_word:
+            continue
+        word = raw_word.lower()
+        start_index, end_index = 0, len(word)
+        if word[end_index - 1] in [',', '.', ':', ';', '?', '!']:
+            if end_index - start_index < 2:
+                continue
+            end_index -= 1
+        if word[start_index] == '(':
+            if end_index - start_index < 2:
+                continue
+            start_index += 1
+        if word[end_index - 1] == ')':
+            if end_index - start_index < 2:
+                continue
+            end_index -= 1
+        word = word[start_index:end_index]
+        if len(word) < 2:
+            continue
+        if re.match("^[{}]+-?[{}]*$".format(all_letters, all_letters), word):
+            text.append(word)
+    return text
+
 
 def create_dictionary(raw_list):
     dictionary = {}
@@ -40,7 +73,8 @@ def sentence_statistic(sentence):
         'digits',
         'other_ASCII_characters'])
     '''
-    return [length, 100*non_ascii_characters/length, 100*small_letters/length, 100*big_letters/length, 100*digits/length, 100*other_ascii_characters/length]
+    return [length, 100 * non_ascii_characters / length, 100 * small_letters / length, 100 * big_letters / length,
+            100 * digits / length, 100 * other_ascii_characters / length]
 
 
 def aggressive_sentence_detector(sentence):
@@ -80,17 +114,17 @@ if __name__ == '__main__':
     import raw_text_processor as rtproc
     from tika import parser
 
-    pdf_path = 'data/Polish/BlochoNalepa.pdf'
+    pdf_path = 'Polish/BlochoNalepa.pdf'
     pdf_text = parser.from_file(pdf_path)
     text = pdf_text['content']
     text = rtproc.join_hyphenated_words(text)
     text = rtproc.delete_square_brackets(text)
     sent = rtproc.split_to_sentences(text)
     sent = select_correct_sentences(sent, sentence_verifier)
-    print_sentences(sent)
-
+    # print_sentences(sent)
 
     from ner import properNounsOut
+
 
     def NER(sentences_list):
         processed_text = " ".join(sentences_list)
@@ -102,11 +136,11 @@ if __name__ == '__main__':
         for k, v in dic.items():
             print(k, v)
 
-    #final = NER(sent)
-    #print_dictionary(final)
 
-
-
+    words_without_proper_names = NER(sent)
+    words = filter_words(words_without_proper_names)
+    final_dict = create_dictionary(words)
+    print_dictionary(final_dict)
 
     '''
     sentences_list = split_to_sentences(join_hyphenated_words(pdf_text['content']))
