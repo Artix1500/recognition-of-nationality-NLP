@@ -13,7 +13,7 @@ def join_hyphenated_words(raw_text):
         result.append(word)
     return ' '.join(result)
 
-
+# remove every existence of regex formula from text
 def delete_regex_from_text(regex, raw_text):
     return "".join(re.split(regex, raw_text))
 
@@ -36,7 +36,7 @@ def split_list_by(raw_list, delimiter):
         result.extend(split_by(sentence, delimiter))
     return result
 
-
+#split raw text to seperate sentences
 def split_to_sentences(raw_text):
     exclamatory_sentences_split = split_by(raw_text, '!')
     interrogative_sentences_split = split_list_by(exclamatory_sentences_split, '?')

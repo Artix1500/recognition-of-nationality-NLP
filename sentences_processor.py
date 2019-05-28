@@ -44,10 +44,11 @@ def create_dictionary(raw_list):
     return dictionary
 
 
+# delete footers by removing sentences that exist more than once
 def delete_footers_and_headers(sentences_list):
     return [k for k, v in create_dictionary(sentences_list).items() if v < 2]
 
-
+# return some statistic about sentence e.g. sentence length number of small letters etc.
 def sentence_statistic(sentence):
     length = len(sentence)
     non_ascii_characters = 0
@@ -71,7 +72,7 @@ def sentence_statistic(sentence):
     return [length, 100 * non_ascii_characters / length, 100 * small_letters / length, 100 * big_letters / length,
             100 * digits / length, 100 * other_ascii_characters / length]
 
-
+# heuristic function to detect if sentence is correct
 def aggressive_sentence_detector(sentence):
     stat = sentence_statistic(sentence)
     if stat[0] < 25:
@@ -86,7 +87,7 @@ def aggressive_sentence_detector(sentence):
         return False
     return True
 
-
+# heurestic function to detect references
 def references_detector(sentence):
     stat = sentence_statistic(sentence[:30])
     return stat[5] * stat[0] / 100 > 5
