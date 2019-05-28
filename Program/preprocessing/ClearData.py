@@ -24,15 +24,11 @@ def ClearData(pathFrom="data.csv", pathTo="ProcessedData.csv", withLemmatization
     if withLemmatization:
         print("Lemmatization")
         data = dataLemmatization(data)
-    if withDropping:
-        print("summing columns")
-        summed_colums = data.sum(axis=0, skipna=True)
-
+  
+    if withDropping:   
         print("dropping columns")
-        data = data[data.columns[data.sum() > minCount]]
+        data = data[data.columns[data.sum(axis=0, skipna=True) > minCount]]
 
-
-    #add column with wordCount
     print("adding wordCount Column")
     data['Word_Count'] = data.sum(axis=1, skipna=True)
     
@@ -45,4 +41,6 @@ def ClearData(pathFrom="data.csv", pathTo="ProcessedData.csv", withLemmatization
 
 
 if __name__ == '__main__':
-    ClearData(withLemmatization=True)
+    ClearData(withLemmatization=True, withDropping=True, pathTo="ProcessedDataLem.csv")
+    ClearData(withLemmatization=False, withDropping=True)
+    

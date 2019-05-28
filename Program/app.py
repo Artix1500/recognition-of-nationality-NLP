@@ -5,6 +5,7 @@ import string
 import os
 import numpy as np
 import codecs
+import csv
 
 import pandas as pd
 from nltk import WordNetLemmatizer
@@ -117,7 +118,7 @@ def addNewRows(newFilesDicts, existingWords, wordQuantitiesMatrix):
 def updateCSV(existingWords, wordQuantitiesMatrix, paths, pathToCSV):
     rows = []
     # if ',' + bla it needs to be added in numbers to
-   # firstRow = ',' + ','.join(existingWords)
+    # firstRow = ',' + ','.join(existingWords)
     firstRow = "path_from_file," +','.join(existingWords)
     rows.append(firstRow)
     global LineCount
@@ -126,8 +127,8 @@ def updateCSV(existingWords, wordQuantitiesMatrix, paths, pathToCSV):
         quantities = paths[i] +',' + ','.join(map(str, wordQuantitiesMatrix.astype(int)[i, :].tolist()))
         rows.append(quantities)
     finalCSVContent = '\n'.join(rows)
- 
     with codecs.open(pathToCSV, 'w', 'utf-8') as csvFile:
+
         csvFile.write(finalCSVContent)
 
 
@@ -147,6 +148,7 @@ def updateData(file, pathToCSV="data.csv"):
 
 
 if __name__ == "__main__":
+    lem = True
     wordsLen = 999
     file = input('I need the name of your file: ')
     #file="data/British/somepdf.pdf"
@@ -154,17 +156,21 @@ if __name__ == "__main__":
     # I think it reads from the pdf
     updateData(file)
     # data.csv -> ProcessedData.csv
-    ClearData(withLemmatization=True)
+    ClearData(withLemmatization=lem)
     # ProcessedData.csv -> SelectedData.csv
     #WordsExtracting()
     TakeMatchingWords()
     # create classifier
     clf = Classifier(inputSize=wordsLen, outputSize=len(NATIONALITIES))
     # load trained model
-    clf.load_model("model.h5")
+    if lem:
+        modelpath="modelLem.h5"
+    else:
+        modelpath="model.h5"
+    clf.load_model(modelpath)
 
     # SelectedData.csv -> vect
-    vp = VectorProcessing(wordCountColumn=-1, xStartColumn=2, xEndColumn=-2, pathColumn=-2 )
+    vp = VectorProcessing(wordCountColumn=-2, xStartColumn=0,xEndColumn=-2,pathColumn=-1 )
     vect = vp.GetVector()
     print(vect)
     vectX = vect[0]['X']

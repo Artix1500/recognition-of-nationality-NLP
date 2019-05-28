@@ -3,12 +3,12 @@ import numpy as np
 from Program.classifier.VectorProcessing import VectorProcessing as vp
 from Program.classifier.variables import NATIONALITIES
 
-def Run():
+def Run(path="SelectedData.csv", pathToSaveModel="model.h5", epochs=30):
     #create classifier
     clf = Classifier(999,len(NATIONALITIES))
 
     #get data
-    trainData , testData = getData()
+    trainData , testData = getData(path)
 
     #get train data
     trainX = np.array(list(map(lambda x: x['X'][0], trainData)))
@@ -19,6 +19,7 @@ def Run():
         tempVector[num] = 1
         trainY.append(tempVector)
     trainY = np.array(trainY)
+
 
     #getting test data
     testX = np.array(list(map(lambda x: x['X'][0], testData)))
@@ -37,7 +38,7 @@ def Run():
     acc_before_train=clf.testAccuracy(trainX, trainY)
 
     #training on the train data
-    clf.train(trainX, trainY, nepochs=30)
+    clf.train(trainX, trainY, nepochs=epochs)
 
     
     print("after accuracy for testing sets----------------------------------------------------------")
@@ -53,11 +54,11 @@ def Run():
     print("accuracy after trainning of the train data: ", acc_after_train)
     
     #save weights
-    clf.save_model()
+    clf.save_model(filename=pathToSaveModel)
     
 
 def getData(path="SelectedData.csv"):
-    vectorProcesser= vp(wordCountColumn=1, xStartColumn=2,xEndColumn=-1,pathColumn=-1)
+    vectorProcesser= vp(wordCountColumn=1, xStartColumn=3,xEndColumn=-1,pathColumn=-1)
     return vectorProcesser.GetData(path)
 
 def getVector(path="SelectedData.csv"):
@@ -66,4 +67,7 @@ def getVector(path="SelectedData.csv"):
 
 
 if __name__ == '__main__':
-    Run()
+    print("Data without lemmatization:")
+    Run(path="SelectedData.csv", pathToSaveModel="model.h5")
+    print("Data with lemmatization:")
+    Run(path="SelectedDataLem.csv", pathToSaveModel="modelLem.h5")

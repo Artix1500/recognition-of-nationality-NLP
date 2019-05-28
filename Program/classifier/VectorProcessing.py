@@ -6,7 +6,7 @@ from Program.classifier.variables import NATIONALITIES
 
 
 class VectorProcessing:
-    def __init__(self, wordCountColumn =1, xStartColumn =3, xEndColumn=-1, pathColumn=-1):
+    def __init__(self, wordCountColumn =-2, xStartColumn =0, xEndColumn=-2, pathColumn=-1):
         self.wordCountColumn = wordCountColumn
         self.xStartColumn=xStartColumn
         # under this index is no word/not included
