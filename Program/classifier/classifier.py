@@ -46,7 +46,10 @@ class Classifier:
     def testAccuracy(self, x, y):
         predictions = []
         good= 0
+        wrong = 0
         all_pieces= len(x)
+
+        conff_matrix = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
         
         for one_x in x:
             predictions.append(self.model.predict(np.asarray(one_x).reshape(1, -1)))
@@ -56,6 +59,20 @@ class Classifier:
             if np.argmax(predictions[i]) == np.argmax(y[i]):
             #    print("goooood")
                 good+=1
+            else:
+                wrong += 1
+            conff_matrix[np.argmax(predictions[i])][np.argmax(y[i])] += 1
+
+        print('\n')
+        print('\n')
+
+        print('\n'.join([''.join(['{:4}'.format(item) for item in row])
+                         for row in conff_matrix]))
+
+        print('\n')
+        print('\n')
+
+        print(str(wrong) + " WRONG out of " + str(good+wrong))
         acc = good/all_pieces
         print("accuracy: ", acc)    
         return acc
